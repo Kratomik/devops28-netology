@@ -335,10 +335,12 @@ tee - получает значения из stdin и записывает их 
 ## Задание
 
 1. Какой системный вызов делает команда `cd`? 
-
     В прошлом ДЗ вы выяснили, что `cd` не является самостоятельной  программой. Это `shell builtin`, поэтому запустить `strace` непосредственно на `cd` не получится. Вы можете запустить `strace` на `/bin/bash -c 'cd /tmp'`. В этом случае увидите полный список системных вызовов, которые делает сам `bash` при старте. 
 
     Вам нужно найти тот единственный, который относится именно к `cd`. Обратите внимание, что `strace` выдаёт результат своей работы в поток stderr, а не в stdout.
+chdir("/tmp")                           = 0
+
+
 
 1. Попробуйте использовать команду `file` на объекты разных типов в файловой системе. Например:
 
@@ -352,10 +354,23 @@ tee - получает значения из stdin и записывает их 
     ```
     
     Используя `strace`, выясните, где находится база данных `file`, на основании которой она делает свои догадки.
+/home/nicolay/.magic.mgc
+/home/nicolay/.magic
+/etc/magic.mgc
+    Далее было обращение:
+/etc/magic
+/usr/share/misc/magic.mgc
+	
 
 1. Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удалён (deleted в lsof), но сказать сигналом приложению переоткрыть файлы или просто перезапустить приложение возможности нет. Так как приложение продолжает писать в удалённый файл, место на диске постепенно заканчивается. Основываясь на знаниях о перенаправлении потоков, предложите способ обнуления открытого удалённого файла, чтобы освободить место на файловой системе.
+kill -HUP 738,
+	,где 738 - pid процесса
+
 
 1. Занимают ли зомби-процессы ресурсы в ОС (CPU, RAM, IO)?
+Зомби-процессы не занимают какие-либо системные ресурсы, но сохраняют свой ID процесса (есть риск исчерпания доступных идентификаторов)
+	
+	
 1. В IO Visor BCC есть утилита `opensnoop`:
 
     ```bash
@@ -365,7 +380,23 @@ tee - получает значения из stdin и записывает их 
     
     На какие файлы вы увидели вызовы группы `open` за первую секунду работы утилиты? Воспользуйтесь пакетом `bpfcc-tools` для Ubuntu 20.04. Дополнительные сведения по установке [по ссылке](https://github.com/iovisor/bcc/blob/master/INSTALL.md).
 
+nicolay@nicolay-VirtualBox:~$ sudo opensnoop-bpfcc
+PID    COMM               FD ERR PATH
+541    NetworkManager     22   0 /var/lib/NetworkManager/timestamps.SZF611
+1      systemd            18   0 /proc/6891/cgroup
+1004   gsd-color          17   0 /etc/localtime
+1004   gsd-color          17   0 /etc/localtime
+1017   gsd-housekeepin    10   0 /etc/fstab
+1017   gsd-housekeepin    10   0 /proc/self/mountinfo
+1017   gsd-housekeepin    10   0 /run/mount/utab
+1017   gsd-housekeepin    10   0 /proc/self/mountinfo
+1017   gsd-housekeepin    10   0 /run/mount/utab
+
+
+
 1. Какой системный вызов использует `uname -a`? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в `/proc` и где можно узнать версию ядра и релиз ОС.
+Part of the utsname information is also accessible via /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}.
+
 
 1. Чем отличается последовательность команд через `;` и через `&&` в bash? Например:
 
@@ -375,12 +406,50 @@ tee - получает значения из stdin и записывает их 
     root@netology1:~# test -d /tmp/some_dir && echo Hi
     root@netology1:~#
     ```
+; - выполелнение команд последовательно
+&& - команда после && выполняется только если команда до && завершилась успешно (статус выхода 0)
+test -d /tmp/some_dir && echo Hi - так как каталога /tmp/some_dir не существует, то статус выхода не равен 0 и echo Hi не будет выполняться
     
     Есть ли смысл использовать в bash `&&`, если применить `set -e`?
+set -e - останавливает выполнение скрипта при ошибке. Я думаю, в скриптах имеет смысл применять set -e с &&, так как она прекращает действие скрипта (не игнорирует ошибку) при ошибке в команде после &&
+Пример,
+
+echo Hi && test -d /tmp/some_dir; echo Bye
+Без set -e скрипт выполнит echo Bye, а с этой командой - нет
+
 
 1. Из каких опций состоит режим bash `set -euxo pipefail`, и почему его хорошо было бы использовать в сценариях?
+-e  Exit immediately if a command exits with a non-zero status.
+-u  Treat unset variables as an error when substituting.
+-x  Print commands and their arguments as they are executed.
+-o pipefail     the return value of a pipeline is the status of
+                           the last command to exit with a non-zero status,
+                           or zero if no command exited with a non-zero status
+Данный режим обеспечит прекращение выполнения скрипта в случае ошибок и выведет необходимую для траблшутинга информацию (по сути логирование выполнения)
+
 
 1. Используя `-o stat` для `ps`, определите, какой наиболее часто встречающийся статус у процессов в системе. В `man ps` изучите (`/PROCESS STATE CODES`), что значат дополнительные к основной заглавной букве статуса процессов. Его можно не учитывать при расчёте (считать S, Ss или Ssl равнозначными).
+
+nicolay@nicolay-VirtualBox:~$ ps -d -o stat | sort | uniq -c
+      6 I
+     32 I<
+      1 R+
+     34 S
+      8 S+
+     11 Sl
+     23 Sl+
+      2 SN
+      1 STAT
+
+For BSD formats and when the stat keyword is used, additional characters may be displayed:
+
+               <    high-priority (not nice to other users)
+               N    low-priority (nice to other users)
+               L    has pages locked into memory (for real-time and custom IO)
+               s    is a session leader
+               l    is multi-threaded (using CLONE_THREAD, like NPTL pthreads do)
+               +    is in the foreground process group
+
 
 ----
 
