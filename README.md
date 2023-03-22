@@ -490,3 +490,218 @@ For BSD formats and when the stat keyword is used, additional characters may be 
 
 * задание выполнено частично или не выполнено вообще;
 * в логике выполнения заданий есть противоречия и существенные недостатки.  
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	# Домашнее задание к занятию «Операционные системы. Лекция 2»
+
+### Цель задания
+
+В результате выполнения задания вы:
+
+* познакомитесь со средством сбора метрик node_exporter и средством сбора и визуализации метрик NetData. Такие инструменты позволяют выстроить систему мониторинга сервисов для своевременного выявления проблем в их работе;
+* построите простой systemd unit-файл для создания долгоживущих процессов, которые стартуют вместе со стартом системы автоматически;
+* проанализируете dmesg, а именно часть лога старта виртуальной машины, чтобы понять, какая полезная информация может там находиться;
+* поработаете с unshare и nsenter для понимания, как создать отдельный namespace для процесса (частичная контейнеризация).
+
+### Чеклист готовности к домашнему заданию
+
+1. Убедитесь, что у вас установлен [Netdata](https://github.com/netdata/netdata) c ресурса с предподготовленными [пакетами](https://packagecloud.io/netdata/netdata/install) или `sudo apt install -y netdata`.
+
+
+### Дополнительные материалы для выполнения задания
+
+1. [Документация](https://www.freedesktop.org/software/systemd/man/systemd.service.html) по systemd unit-файлам.
+2. [Документация](https://www.kernel.org/doc/Documentation/sysctl/) по параметрам sysctl.
+
+------
+
+## Задание
+
+1. На лекции вы познакомились с [node_exporter](https://github.com/prometheus/node_exporter/releases). В демонстрации его исполняемый файл запускался в background. Этого достаточно для демо, но не для настоящей production-системы, где процессы должны находиться под внешним управлением. Используя знания из лекции по systemd, создайте самостоятельно простой [unit-файл](https://www.freedesktop.org/software/systemd/man/systemd.service.html) для node_exporter:
+
+    * поместите его в автозагрузку;
+    * предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на `systemctl cat cron`);
+    * удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.
+	
+	nicolay@nicolay-VirtualBox:~$ cat /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Prometheus Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter --web.config=/opt/node_exporter/web.yml
+
+[Install]
+WantedBy=multi-user.target
+Процесс корректно стартует, завершается, перезапускается (в том числе после ребута)
+	
+	● node_exporter.service - Prometheus Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2023-03-22 20:01:20 +07; 1s ago
+   Main PID: 1628 (node_exporter)
+      Tasks: 4 (limit: 4614)
+     Memory: 1.8M
+     CGroup: /system.slice/node_exporter.service
+             └─1628 /usr/local/bin/node_exporter --web.config=/opt/node_exporter/web.yml
+
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.823Z caller=node_exporter.go:112 collector=thermal_zone
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=time
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=timex
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=udp_queues
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=uname
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=vmstat
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=xfs
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:112 collector=zfs
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=node_exporter.go:191 msg="Listening on" addres>
+мар 22 20:01:20 nicolay-VirtualBox node_exporter[1628]: level=info ts=2023-03-22T13:01:20.824Z caller=tls_config.go:203 msg="TLS is disabled and it >
+lines 1-19/19 (END)
+	
+nicolay@nicolay-VirtualBox:~$ ps -e |grep node_exporter
+   1628 ?        00:00:00 node_exporter
+
+nicolay@nicolay-VirtualBox:~$ sudo cat /proc/1628/environ
+LANG=ru_RU.UTF-8PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/binHOME=/home/node_exporterLOGNAME=node_exporterUSER=node_exporterINVOCATION_ID=bd73851af9aa4bedadbe07310d976422JOURNAL_STREAM=8:36350nicolay	
+
+1. Изучите опции node_exporter и вывод `/metrics` по умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
+	
+	Для CPU (для каждого из возможных ядер)
+node_cpu_seconds_total{cpu="0",mode="idle"}
+node_cpu_seconds_total{cpu="0",mode="system"}
+node_cpu_seconds_total{cpu="0",mode="user"}
+process_cpu_seconds_total
+
+	Для ОЗУ
+node_memory_MemAvailable_bytes
+node_memory_MemFree_bytes
+node_memory_Buffers_bytes
+node_memory_Cached_bytes
+
+	По дискам (выбрать необходимые диски)
+node_disk_io_time_seconds_total{device="sda"}
+node_disk_read_time_seconds_total{device="sda"}
+node_disk_write_time_seconds_total{device="sda"}
+node_filesystem_avail_bytes
+
+	По сети
+node_network_info
+node_network_receive_bytes_total
+node_network_receive_errs_total
+node_network_transmit_bytes_total
+node_network_transmit_errs_total
+
+1. Установите в свою виртуальную машину [Netdata](https://github.com/netdata/netdata). Воспользуйтесь [готовыми пакетами](https://packagecloud.io/netdata/netdata/install) для установки (`sudo apt install -y netdata`). 
+   
+   После успешной установки:
+   
+    * в конфигурационном файле `/etc/netdata/netdata.conf` в секции [web] замените значение с localhost на `bind to = 0.0.0.0`;
+    * добавьте в Vagrantfile проброс порта Netdata на свой локальный компьютер и сделайте `vagrant reload`:
+
+    ```bash
+    config.vm.network "forwarded_port", guest: 19999, host: 19999
+    ```
+
+    После успешной перезагрузки в браузере на своём ПК (не в виртуальной машине) вы должны суметь зайти на `localhost:19999`. Ознакомьтесь с метриками, которые по умолчанию собираются Netdata, и с комментариями, которые даны к этим метрикам.
+	
+	nicolay@nicolay-VirtualBox:~$ sudo ss -tulpn | grep :19999
+tcp     LISTEN   0        4096             0.0.0.0:19999          0.0.0.0:*      users:(("netdata",pid=690,fd=4)) 
+	
+
+1. Можно ли по выводу `dmesg` понять, осознаёт ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?
+	nicolay@nicolay-VirtualBox:~$ dmesg | grep -i virtual
+[    0.000000] DMI: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+[    0.002958] CPU MTRRs all blank - virtualized system.
+[    0.025949] Booting paravirtualized kernel on KVM
+[    1.619009] usb 1-1: Manufacturer: VirtualBox
+[    1.823675] input: VirtualBox USB Tablet as /devices/pci0000:00/0000:00:06.0/usb1/1-1/1-1:1.0/0003:80EE:0021.0001/input/input6
+[    1.823858] hid-generic 0003:80EE:0021.0001: input,hidraw0: USB HID v1.10 Mouse [VirtualBox USB Tablet] on usb-0000:00:06.0-1/input0
+[    3.001490] systemd[1]: Detected virtualization oracle.
+[    3.004070] systemd[1]: Set hostname to <nicolay-VirtualBox>.
+[    6.022016] input: VirtualBox mouse integration as /devices/pci0000:00/0000:00:04.0/input/input7
+
+	
+
+1. Как настроен sysctl `fs.nr_open` на системе по умолчанию? Определите, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (`ulimit --help`)?
+	nicolay@nicolay-VirtualBox:~$ /sbin/sysctl -n fs.nr_open
+1048576
+nr_open - означает максимальное число дескрипторов, которые может использовать процесс. Но этого значения не дает достичь другой лимит:
+
+nicolay@nicolay-VirtualBox:~$ ulimit -n
+1024
+	
+	
+1. Запустите любой долгоживущий процесс (не `ls`, который отработает мгновенно, а, например, `sleep 1h`) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через `nsenter`. Для простоты работайте в этом задании под root (`sudo -i`). Под обычным пользователем требуются дополнительные опции (`--map-root-user`) и т. д.
+
+nicolay@nicolay-VirtualBox:~$ sudo unshare -f --pid --mount-proc sleep 1h
+nicolay@nicolay-VirtualBox:~$ ps -aux | grep sleep
+root        1664  0.0  0.0  16716   576 pts/0    S    20:22   0:00 sleep 1h
+root        1669  0.0  0.0  16716   512 pts/0    S    20:23   0:00 sleep 1h
+root        1809  0.0  0.1  20624  4764 pts/0    S+   20:34   0:00 sudo unshare -f --pid --mount-proc sleep 1h
+root        1810  0.0  0.0  16720   516 pts/0    S+   20:34   0:00 unshare -f --pid --mount-proc sleep 1h
+root        1811  0.0  0.0  16716   580 pts/0    S+   20:34   0:00 sleep 1h
+nicolay     1880  0.0  0.0  17696   712 pts/1    S+   20:34   0:00 grep --color=auto sleep
+
+nicolay@nicolay-VirtualBox:/proc$ sudo nsenter --target 1811 --pid --mount
+root@nicolay-VirtualBox:/# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0  16716   580 pts/0    S+   20:34   0:00 sleep 1h
+root           2  0.2  0.1  19236  4916 pts/2    S    20:38   0:00 -bash
+root          11  0.0  0.0  20160  3388 pts/2    R+   20:39   0:00 ps aux
+
+
+
+1. Найдите информацию о том, что такое `:(){ :|:& };:`.
+ Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (**это важно, поведение в других ОС не проверялось**). Некоторое время всё будет плохо, после чего (спустя минуты) — ОС должна стабилизироваться.
+fork-бомба — вредоносная или ошибочно написанная программа, бесконечно создающая свои копии (системным вызовом fork()), которые обычно также начинают создавать свои копии и т. д.
+Выполнение такой программы может вызывать большую нагрузку вычислительной системы или даже отказ в обслуживании вследствие нехватки системных ресурсов (дескрипторов процессов, памяти, процессорного времени), что и является целью.
+
+
+ Вызов `dmesg` расскажет, какой механизм помог автоматической стабилизации.  
+Как настроен этот механизм по умолчанию, и как изменить число процессов, которое можно создать в сессии?
+[ 5667.545996] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-6.scope
+
+nicolay@nicolay-VirtualBox:~$ ulimit -u
+15380
+
+nicolay@nicolay-VirtualBox:~$ ulimit -u 500
+
+*В качестве решения отправьте ответы на вопросы и опишите, как эти ответы были получены.*
+
+----
+
+### Правила приёма домашнего задания
+
+В личном кабинете отправлена ссылка на .md-файл в вашем репозитории.
+
+-----
+
+### Критерии оценки
+
+Зачёт:
+
+* выполнены все задания;
+* ответы даны в развёрнутой форме;
+* приложены соответствующие скриншоты и файлы проекта;
+* в выполненных заданиях нет противоречий и нарушения логики.
+
+На доработку:
+
+* задание выполнено частично или не выполнено вообще;
+* в логике выполнения заданий есть противоречия и существенные недостатки. 
