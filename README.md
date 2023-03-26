@@ -705,3 +705,520 @@ nicolay@nicolay-VirtualBox:~$ ulimit -u 500
 
 * задание выполнено частично или не выполнено вообще;
 * в логике выполнения заданий есть противоречия и существенные недостатки. 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	# Домашнее задание к занятию «Файловые системы»
+
+### Цель задания
+
+В результате выполнения задания вы: 
+
+* научитесь работать с инструментами разметки жёстких дисков, виртуальных разделов — RAID-массивами и логическими томами, конфигурациями файловых систем. Основная задача — понять, какие слои абстракций могут нас отделять от файловой системы до железа. Обычно инженер инфраструктуры не сталкивается напрямую с настройкой LVM или RAID, но иметь понимание, как это работает, необходимо;
+* создадите нештатную ситуацию работы жёстких дисков и поймёте, как система RAID обеспечивает отказоустойчивую работу.
+
+
+### Чеклист готовности к домашнему заданию
+
+1. Убедитесь, что у вас на новой виртуальной машине  установлены утилиты: `mdadm`, `fdisk`, `sfdisk`, `mkfs`, `lsblk`, `wget` (шаг 3 в задании).  
+2. Воспользуйтесь пакетным менеджером apt для установки необходимых инструментов.
+
+
+### Дополнительные материалы для выполнения задания
+
+1. Разряженные файлы — [sparse](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D0%B5%D0%B6%D1%91%D0%BD%D0%BD%D1%8B%D0%B9_%D1%84%D0%B0%D0%B9%D0%BB).
+2. [Подробный анализ производительности RAID](https://www.baarf.dk/BAARF/0.Millsap1996.08.21-VLDB.pdf), страницы 3–19.
+3. [RAID5 write hole](https://www.intel.com/content/www/us/en/support/articles/000057368/memory-and-storage.html).
+
+
+------
+
+## Задание
+
+1. Узнайте о [sparse-файлах](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D0%B5%D0%B6%D1%91%D0%BD%D0%BD%D1%8B%D0%B9_%D1%84%D0%B0%D0%B9%D0%BB) (разряженных).
+
+Разреженные файлы - это файлы, для которых выделяется пространство на диске только для участков с ненулевыми данными. Список всех "дыр" хранится в метаданных ФС и используется при операциях с файлами. В результате получается, что разреженный файл занимает меньше места на диске (более эффективное использование дискового пространства)
+
+
+1. Могут ли файлы, являющиеся жёсткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
+
+Не могут, такие жесткие ссылки имеют один и тот же inode (объект, который содержит метаданные файла).
+
+
+1. Сделайте `vagrant destroy` на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
+
+    ```ruby
+    path_to_disk_folder = './disks'
+
+    host_params = {
+        'disk_size' => 2560,
+        'disks'=>[1, 2],
+        'cpus'=>2,
+        'memory'=>2048,
+        'hostname'=>'sysadm-fs',
+        'vm_name'=>'sysadm-fs'
+    }
+    Vagrant.configure("2") do |config|
+        config.vm.box = "bento/ubuntu-20.04"
+        config.vm.hostname=host_params['hostname']
+        config.vm.provider :virtualbox do |v|
+
+            v.name=host_params['vm_name']
+            v.cpus=host_params['cpus']
+            v.memory=host_params['memory']
+
+            host_params['disks'].each do |disk|
+                file_to_disk=path_to_disk_folder+'/disk'+disk.to_s+'.vdi'
+                unless File.exist?(file_to_disk)
+                    v.customize ['createmedium', '--filename', file_to_disk, '--size', host_params['disk_size']]
+                    v.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', disk.to_s, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
+                end
+            end
+        end
+        config.vm.network "private_network", type: "dhcp"
+    end
+    ```
+
+    Эта конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2,5 Гб.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0     4K  1 loop /snap/bare/5
+loop1    7:1    0 346,3M  1 loop /snap/gnome-3-38-2004/115
+loop2    7:2    0  63,3M  1 loop /snap/core20/1828
+loop3    7:3    0 346,3M  1 loop /snap/gnome-3-38-2004/119
+loop4    7:4    0  63,3M  1 loop /snap/core20/1852
+loop5    7:5    0  91,7M  1 loop /snap/gtk-common-themes/1535
+loop6    7:6    0  54,2M  1 loop /snap/snap-store/558
+loop7    7:7    0    46M  1 loop /snap/snap-store/638
+loop8    7:8    0  49,9M  1 loop /snap/snapd/18357
+loop9    7:9    0  49,9M  1 loop /snap/snapd/18596
+sda      8:0    0    50G  0 disk
+├─sda1   8:1    0   512M  0 part /boot/efi
+├─sda2   8:2    0     1K  0 part
+└─sda5   8:5    0  49,5G  0 part /
+sdb      8:16   0   2,5G  0 disk
+sdc      8:32   0   2,5G  0 disk
+
+
+1. Используя `fdisk`, разбейте первый диск на два раздела: 2 Гб и оставшееся пространство.
+
+nicolay@nicolay-VirtualBox:~$ sudo fdisk /dev/sdb
+
+Добро пожаловать в fdisk (util-linux 2.34).
+Изменения останутся только в памяти до тех пор, пока вы не решите записать их.
+Будьте внимательны, используя команду write.
+
+Устройство не содержит стандартной таблицы разделов.
+Создана новая метка DOS с идентификатором 0x8c7bac1d.
+
+Команда (m для справки): n
+Тип раздела
+   p   основной (0 первичный, 0 расширеный, 4 свободно)
+   e   расширенный (контейнер для логических разделов)
+Выберите (по умолчанию - p): p
+Номер раздела (1-4, по умолчанию 1):
+Первый сектор (2048-5242879, по умолчанию 2048):
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-5242879, по умолчанию 5242879): +2G
+
+Создан новый раздел 1 с типом 'Linux' и размером 2 GiB.
+
+Команда (m для справки): n
+Тип раздела
+   p   основной (1 первичный, 0 расширеный, 3 свободно)
+   e   расширенный (контейнер для логических разделов)
+Выберите (по умолчанию - p):
+
+Используется ответ по умолчанию p
+Номер раздела (2-4, по умолчанию 2):
+Первый сектор (4196352-5242879, по умолчанию 4196352):
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (4196352-5242879, по умолчанию 5242879):
+
+Создан новый раздел 2 с типом 'Linux' и размером 511 MiB.
+
+Команда (m для справки): w
+Таблица разделов была изменена.
+Вызывается ioctl() для перечитывания таблицы разделов.
+Синхронизируются диски.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0     4K  1 loop /snap/bare/5
+loop1    7:1    0 346,3M  1 loop /snap/gnome-3-38-2004/115
+loop2    7:2    0  63,3M  1 loop /snap/core20/1828
+loop3    7:3    0 346,3M  1 loop /snap/gnome-3-38-2004/119
+loop4    7:4    0  63,3M  1 loop /snap/core20/1852
+loop5    7:5    0  91,7M  1 loop /snap/gtk-common-themes/1535
+loop6    7:6    0  54,2M  1 loop /snap/snap-store/558
+loop7    7:7    0    46M  1 loop /snap/snap-store/638
+loop8    7:8    0  49,9M  1 loop /snap/snapd/18357
+loop9    7:9    0  49,9M  1 loop /snap/snapd/18596
+sda      8:0    0    50G  0 disk
+├─sda1   8:1    0   512M  0 part /boot/efi
+├─sda2   8:2    0     1K  0 part
+└─sda5   8:5    0  49,5G  0 part /
+sdb      8:16   0   2,5G  0 disk
+├─sdb1   8:17   0     2G  0 part
+└─sdb2   8:18   0   511M  0 part
+sdc      8:32   0   2,5G  0 disk
+
+
+
+1. Используя `sfdisk`, перенесите эту таблицу разделов на второй диск.
+
+nicolay@nicolay-VirtualBox:~$ sudo sfdisk -d /dev/sdb | sudo sfdisk /dev/sdc
+Проверяется, чтобы сейчас никто не использовал этот диск... ОК
+
+Диск /dev/sdc: 2,51 GiB, 2684354560 байт, 5242880 секторов
+Disk model: VBOX HARDDISK
+Единицы: секторов по 1 * 512 = 512 байт
+Размер сектора (логический/физический): 512 байт / 512 байт
+Размер I/O (минимальный/оптимальный): 512 байт / 512 байт
+
+>>> Заголовок скрипта принят.
+>>> Заголовок скрипта принят.
+>>> Заголовок скрипта принят.
+>>> Заголовок скрипта принят.
+>>> Создана новая метка DOS с идентификатором 0x8c7bac1d.
+/dev/sdc1: Создан новый раздел 1 с типом 'Linux' и размером 2 GiB.
+/dev/sdc2: Создан новый раздел 2 с типом 'Linux' и размером 511 MiB.
+/dev/sdc3: Готово.
+
+Новая ситуация:
+Тип метки диска: dos
+Идентификатор диска: 0x8c7bac1d
+
+Устр-во    Загрузочный  начало   Конец Секторы Размер Идентификатор Тип
+/dev/sdc1                 2048 4196351 4194304     2G            83 Linux
+/dev/sdc2              4196352 5242879 1046528   511M            83 Linux
+
+Таблица разделов была изменена
+Вызывается ioctl() для перечитывания таблицы разделов.
+Синхронизируются диски.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0     4K  1 loop /snap/bare/5
+loop1    7:1    0 346,3M  1 loop /snap/gnome-3-38-2004/115
+loop2    7:2    0  63,3M  1 loop /snap/core20/1828
+loop3    7:3    0 346,3M  1 loop /snap/gnome-3-38-2004/119
+loop4    7:4    0  63,3M  1 loop /snap/core20/1852
+loop5    7:5    0  91,7M  1 loop /snap/gtk-common-themes/1535
+loop6    7:6    0  54,2M  1 loop /snap/snap-store/558
+loop7    7:7    0    46M  1 loop /snap/snap-store/638
+loop8    7:8    0  49,9M  1 loop /snap/snapd/18357
+loop9    7:9    0  49,9M  1 loop /snap/snapd/18596
+sda      8:0    0    50G  0 disk
+├─sda1   8:1    0   512M  0 part /boot/efi
+├─sda2   8:2    0     1K  0 part
+└─sda5   8:5    0  49,5G  0 part /
+sdb      8:16   0   2,5G  0 disk
+├─sdb1   8:17   0     2G  0 part
+└─sdb2   8:18   0   511M  0 part
+sdc      8:32   0   2,5G  0 disk
+├─sdc1   8:33   0     2G  0 part
+└─sdc2   8:34   0   511M  0 part
+
+1. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
+
+nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md0 -l 1 -n 2 /dev/sdb1 /dev/sdc1
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? y
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+
+
+1. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
+
+nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md1 -l 0 -n 2 /dev/sdb2 /dev/sdc2
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md1 started.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME    MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+loop0     7:0    0     4K  1 loop  /snap/bare/5
+loop1     7:1    0 346,3M  1 loop  /snap/gnome-3-38-2004/115
+loop2     7:2    0  63,3M  1 loop  /snap/core20/1828
+loop3     7:3    0 346,3M  1 loop  /snap/gnome-3-38-2004/119
+loop4     7:4    0  63,3M  1 loop  /snap/core20/1852
+loop5     7:5    0  91,7M  1 loop  /snap/gtk-common-themes/1535
+loop6     7:6    0  54,2M  1 loop  /snap/snap-store/558
+loop7     7:7    0    46M  1 loop  /snap/snap-store/638
+loop8     7:8    0  49,9M  1 loop  /snap/snapd/18357
+loop9     7:9    0  49,9M  1 loop  /snap/snapd/18596
+sda       8:0    0    50G  0 disk
+├─sda1    8:1    0   512M  0 part  /boot/efi
+├─sda2    8:2    0     1K  0 part
+└─sda5    8:5    0  49,5G  0 part  /
+sdb       8:16   0   2,5G  0 disk
+├─sdb1    8:17   0     2G  0 part
+│ └─md0   9:0    0     2G  0 raid1
+└─sdb2    8:18   0   511M  0 part
+  └─md1   9:1    0  1018M  0 raid0
+sdc       8:32   0   2,5G  0 disk
+├─sdc1    8:33   0     2G  0 part
+│ └─md0   9:0    0     2G  0 raid1
+└─sdc2    8:34   0   511M  0 part
+  └─md1   9:1    0  1018M  0 raid0
+
+
+1. Создайте два независимых PV на получившихся md-устройствах.
+
+nicolay@nicolay-VirtualBox:~$ sudo pvcreate /dev/md1 /dev/md0
+  Physical volume "/dev/md1" successfully created.
+  Physical volume "/dev/md0" successfully created.
+nicolay@nicolay-VirtualBox:~$ sudo pvscan
+  PV /dev/md0                      lvm2 [<2,00 GiB]
+  PV /dev/md1                      lvm2 [1018,00 MiB]
+  Total: 2 [2,99 GiB] / in use: 0 [0   ] / in no VG: 2 [2,99 GiB]
+
+
+1. Создайте общую volume-group на этих двух PV.
+
+nicolay@nicolay-VirtualBox:~$ sudo vgcreate VG1 /dev/md0 /dev/md1
+  Volume group "VG1" successfully created
+nicolay@nicolay-VirtualBox:~$ sudo vgscan
+  Found volume group "VG1" using metadata type lvm2
+
+nicolay@nicolay-VirtualBox:~$ sudo pvdisplay
+  --- Physical volume ---
+  PV Name               /dev/md0
+  VG Name               VG1
+  PV Size               <2,00 GiB / not usable 0
+  Allocatable           yes
+  PE Size               4,00 MiB
+  Total PE              511
+  Free PE               511
+  Allocated PE          0
+  PV UUID               WvgmRg-fyyk-K3Xi-0sVG-brv1-hNVY-chcULk
+
+  --- Physical volume ---
+  PV Name               /dev/md1
+  VG Name               VG1
+  PV Size               1018,00 MiB / not usable 2,00 MiB
+  Allocatable           yes
+  PE Size               4,00 MiB
+  Total PE              254
+  Free PE               254
+  Allocated PE          0
+  PV UUID               9WyUe1-XlOI-IiJg-0nY4-6FtP-s5x5-ZC7Ihz
+
+
+1. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
+
+nicolay@nicolay-VirtualBox:~$ sudo lvcreate -L 100M -n LV1 VG1 /dev/md1
+  Logical volume "LV1" created.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+loop0           7:0    0     4K  1 loop  /snap/bare/5
+loop1           7:1    0 346,3M  1 loop  /snap/gnome-3-38-2004/115
+loop2           7:2    0  63,3M  1 loop  /snap/core20/1828
+loop3           7:3    0 346,3M  1 loop  /snap/gnome-3-38-2004/119
+loop4           7:4    0  63,3M  1 loop  /snap/core20/1852
+loop5           7:5    0  91,7M  1 loop  /snap/gtk-common-themes/1535
+loop6           7:6    0  54,2M  1 loop  /snap/snap-store/558
+loop7           7:7    0    46M  1 loop  /snap/snap-store/638
+loop8           7:8    0  49,9M  1 loop  /snap/snapd/18357
+loop9           7:9    0  49,9M  1 loop  /snap/snapd/18596
+sda             8:0    0    50G  0 disk
+├─sda1          8:1    0   512M  0 part  /boot/efi
+├─sda2          8:2    0     1K  0 part
+└─sda5          8:5    0  49,5G  0 part  /
+sdb             8:16   0   2,5G  0 disk
+├─sdb1          8:17   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+└─sdb2          8:18   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+    └─VG1-LV1 253:0    0   100M  0 lvm
+sdc             8:32   0   2,5G  0 disk
+├─sdc1          8:33   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+└─sdc2          8:34   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+    └─VG1-LV1 253:0    0   100M  0 lvm
+
+
+1. Создайте `mkfs.ext4` ФС на получившемся LV.
+
+nicolay@nicolay-VirtualBox:~$ sudo mkfs.ext4 /dev/VG1/LV1
+mke2fs 1.45.5 (07-Jan-2020)
+Creating filesystem with 25600 4k blocks and 25600 inodes
+
+Allocating group tables: done
+Сохранение таблицы inod'ов: done
+Создание журнала (1024 блоков): готово
+Writing superblocks and filesystem accounting information: готово
+
+
+1. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
+
+nicolay@nicolay-VirtualBox:~$ mkdir /tmp/new
+nicolay@nicolay-VirtualBox:~$ sudo mount /dev/VG1/LV1 /tmp/new
+
+
+1. Поместите туда тестовый файл, например, `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
+
+nicolay@nicolay-VirtualBox:~$ sudo wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
+--2023-03-26 19:54:15--  https://mirror.yandex.ru/ubuntu/ls-lR.gz
+Распознаётся mirror.yandex.ru (mirror.yandex.ru)… 213.180.204.183, 2a02:6b8::183
+Подключение к mirror.yandex.ru (mirror.yandex.ru)|213.180.204.183|:443... соединение установлено.
+HTTP-запрос отправлен. Ожидание ответа… 200 OK
+Длина: 24587067 (23M) [application/octet-stream]
+Сохранение в: «/tmp/new/test.gz»
+
+/tmp/new/test.gz                      100%[======================================================================>]  23,45M  4,89MB/s    за 4,8s
+
+2023-03-26 19:54:20 (4,85 MB/s) - «/tmp/new/test.gz» сохранён [24587067/24587067]
+
+
+1. Прикрепите вывод `lsblk`.
+
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+loop0           7:0    0     4K  1 loop  /snap/bare/5
+loop1           7:1    0 346,3M  1 loop  /snap/gnome-3-38-2004/115
+loop2           7:2    0  63,3M  1 loop  /snap/core20/1828
+loop3           7:3    0 346,3M  1 loop  /snap/gnome-3-38-2004/119
+loop4           7:4    0  63,3M  1 loop  /snap/core20/1852
+loop5           7:5    0  91,7M  1 loop  /snap/gtk-common-themes/1535
+loop6           7:6    0  54,2M  1 loop  /snap/snap-store/558
+loop7           7:7    0    46M  1 loop  /snap/snap-store/638
+loop8           7:8    0  49,9M  1 loop  /snap/snapd/18357
+loop9           7:9    0  49,9M  1 loop  /snap/snapd/18596
+sda             8:0    0    50G  0 disk
+├─sda1          8:1    0   512M  0 part  /boot/efi
+├─sda2          8:2    0     1K  0 part
+└─sda5          8:5    0  49,5G  0 part  /
+sdb             8:16   0   2,5G  0 disk
+├─sdb1          8:17   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+└─sdb2          8:18   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+    └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
+sdc             8:32   0   2,5G  0 disk
+├─sdc1          8:33   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+└─sdc2          8:34   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+    └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
+
+
+1. Протестируйте целостность файла:
+
+    ```bash
+    root@vagrant:~# gzip -t /tmp/new/test.gz
+    root@vagrant:~# echo $?
+    0
+    ```
+nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
+nicolay@nicolay-VirtualBox:~$ echo $?
+0
+
+
+
+1. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
+
+nicolay@nicolay-VirtualBox:~$ sudo pvmove /dev/md1 /dev/md0
+  /dev/md1: Moved: 4,00%
+  /dev/md1: Moved: 100,00%
+nicolay@nicolay-VirtualBox:~$ lsblk
+NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+loop0           7:0    0     4K  1 loop  /snap/bare/5
+loop1           7:1    0 346,3M  1 loop  /snap/gnome-3-38-2004/115
+loop2           7:2    0  63,3M  1 loop  /snap/core20/1828
+loop3           7:3    0 346,3M  1 loop  /snap/gnome-3-38-2004/119
+loop4           7:4    0  63,3M  1 loop  /snap/core20/1852
+loop5           7:5    0  91,7M  1 loop  /snap/gtk-common-themes/1535
+loop6           7:6    0  54,2M  1 loop  /snap/snap-store/558
+loop7           7:7    0    46M  1 loop  /snap/snap-store/638
+loop8           7:8    0  49,9M  1 loop  /snap/snapd/18357
+loop9           7:9    0  49,9M  1 loop  /snap/snapd/18596
+sda             8:0    0    50G  0 disk
+├─sda1          8:1    0   512M  0 part  /boot/efi
+├─sda2          8:2    0     1K  0 part
+└─sda5          8:5    0  49,5G  0 part  /
+sdb             8:16   0   2,5G  0 disk
+├─sdb1          8:17   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+│   └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
+└─sdb2          8:18   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+sdc             8:32   0   2,5G  0 disk
+├─sdc1          8:33   0     2G  0 part
+│ └─md0         9:0    0     2G  0 raid1
+│   └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
+└─sdc2          8:34   0   511M  0 part
+  └─md1         9:1    0  1018M  0 raid0
+
+1. Сделайте `--fail` на устройство в вашем RAID1 md.
+
+nicolay@nicolay-VirtualBox:~$ sudo mdadm /dev/md0 -f /dev/sdc1
+mdadm: set /dev/sdc1 faulty in /dev/md0
+
+
+1. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
+
+[ 1014.562238] md/raid1:md0: not clean -- starting background reconstruction
+[ 1014.562247] md/raid1:md0: active with 2 out of 2 mirrors
+[ 1014.562331] md0: detected capacity change from 0 to 4188160
+[ 1014.565354] md: resync of RAID array md0
+[ 1055.654710] md: md0: resync done.
+[ 1068.428013] md1: detected capacity change from 0 to 2084864
+[ 1289.331906] lvm2-activation-generator: lvmconfig failed
+[ 1289.953041] lvm2-activation-generator: lvmconfig failed
+[ 2013.213756] EXT4-fs (dm-0): mounted filesystem with ordered data mode. Opts: (null). Quota mode: none.
+[ 2013.213808] ext4 filesystem being mounted at /tmp/new supports timestamps until 2038 (0x7fffffff)
+[ 2459.640995] dm-1: detected capacity change from 204800 to 8192
+[ 2623.941318] md/raid1:md0: Disk failure on sdc1, disabling device.
+               md/raid1:md0: Operation continuing on 1 devices.
+
+1. Протестируйте целостность файла — он должен быть доступен несмотря на «сбойный» диск:
+
+    ```bash
+    root@vagrant:~# gzip -t /tmp/new/test.gz
+    root@vagrant:~# echo $?
+    0
+    ```
+
+nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
+nicolay@nicolay-VirtualBox:~$ echo $?
+0
+
+
+1. Погасите тестовый хост — `vagrant destroy`.
+ 
+*В качестве решения пришлите ответы на вопросы и опишите, как они были получены.*
+
+----
+
+### Правила приёма домашнего задания
+
+В личном кабинете отправлена ссылка на .md-файл в вашем репозитории.
+
+
+### Критерии оценки
+
+Зачёт:
+
+* выполнены все задания;
+* ответы даны в развёрнутой форме;
+* приложены соответствующие скриншоты и файлы проекта;
+* в выполненных заданиях нет противоречий и нарушения логики.
+
+На доработку:
+
+* задание выполнено частично или не выполнено вообще;
+* в логике выполнения заданий есть противоречия и существенные недостатки. 
