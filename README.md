@@ -788,7 +788,9 @@ nicolay@nicolay-VirtualBox:~$ ulimit -u 500
     ```
 
     Эта конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2,5 Гб.
-
+	
+	
+	
 nicolay@nicolay-VirtualBox:~$ lsblk
 NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 loop0    7:0    0     4K  1 loop /snap/bare/5
@@ -808,6 +810,8 @@ sda      8:0    0    50G  0 disk
 sdb      8:16   0   2,5G  0 disk
 sdc      8:32   0   2,5G  0 disk
 
+	
+	
 
 4. Используя `fdisk`, разбейте первый диск на два раздела: 2 Гб и оставшееся пространство.
 
@@ -872,8 +876,11 @@ sdc      8:32   0   2,5G  0 disk
 
 
 
+
 5. Используя `sfdisk`, перенесите эту таблицу разделов на второй диск.
 
+	
+	
 nicolay@nicolay-VirtualBox:~$ sudo sfdisk -d /dev/sdb | sudo sfdisk /dev/sdc
 Проверяется, чтобы сейчас никто не использовал этот диск... ОК
 
@@ -926,20 +933,25 @@ sdb      8:16   0   2,5G  0 disk
 sdc      8:32   0   2,5G  0 disk
 ├─sdc1   8:33   0     2G  0 part
 └─sdc2   8:34   0   511M  0 part
+	
+	
+	
 
 6. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
 
 nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md0 -l 1 -n 2 /dev/sdb1 /dev/sdc1
 mdadm: Note: this array has metadata at the start and
-    may not be suitable as a boot device.  If you plan to
-    store '/boot' on this device please ensure that
-    your boot-loader understands md/v1.x metadata, or use
-    --metadata=0.90
+may not be suitable as a boot device.  If you plan to
+store '/boot' on this device please ensure that
+your boot-loader understands md/v1.x metadata, or use
+--metadata=0.90
 Continue creating array? y
 mdadm: Defaulting to version 1.2 metadata
 mdadm: array /dev/md0 started.
 
 
+
+	
 7. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
 
 nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md1 -l 0 -n 2 /dev/sdb2 /dev/sdc2
@@ -974,23 +986,26 @@ sdc       8:32   0   2,5G  0 disk
   └─md1   9:1    0  1018M  0 raid0
 
 
+
 8. Создайте два независимых PV на получившихся md-устройствах.
 
 nicolay@nicolay-VirtualBox:~$ sudo pvcreate /dev/md1 /dev/md0
-  Physical volume "/dev/md1" successfully created.
-  Physical volume "/dev/md0" successfully created.
+Physical volume "/dev/md1" successfully created.
+Physical volume "/dev/md0" successfully created.
 nicolay@nicolay-VirtualBox:~$ sudo pvscan
-  PV /dev/md0                      lvm2 [<2,00 GiB]
-  PV /dev/md1                      lvm2 [1018,00 MiB]
-  Total: 2 [2,99 GiB] / in use: 0 [0   ] / in no VG: 2 [2,99 GiB]
+PV /dev/md0                      lvm2 [<2,00 GiB]
+PV /dev/md1                      lvm2 [1018,00 MiB]
+Total: 2 [2,99 GiB] / in use: 0 [0   ] / in no VG: 2 [2,99 GiB]
 
 
+
+					     
 9. Создайте общую volume-group на этих двух PV.
 
 nicolay@nicolay-VirtualBox:~$ sudo vgcreate VG1 /dev/md0 /dev/md1
-  Volume group "VG1" successfully created
+Volume group "VG1" successfully created
 nicolay@nicolay-VirtualBox:~$ sudo vgscan
-  Found volume group "VG1" using metadata type lvm2
+Found volume group "VG1" using metadata type lvm2
 
 nicolay@nicolay-VirtualBox:~$ sudo pvdisplay
   --- Physical volume ---
