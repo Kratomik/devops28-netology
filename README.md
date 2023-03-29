@@ -743,17 +743,17 @@ nicolay@nicolay-VirtualBox:~$ ulimit -u 500
 
 ## Задание
 
-1. Узнайте о [sparse-файлах](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D0%B5%D0%B6%D1%91%D0%BD%D0%BD%D1%8B%D0%B9_%D1%84%D0%B0%D0%B9%D0%BB) (разряженных).
+1) Узнайте о [sparse-файлах](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D0%B7%D1%80%D0%B5%D0%B6%D1%91%D0%BD%D0%BD%D1%8B%D0%B9_%D1%84%D0%B0%D0%B9%D0%BB) (разряженных).
 
-Разреженные файлы - это файлы, для которых выделяется пространство на диске только для участков с ненулевыми данными. Список всех "дыр" хранится в метаданных ФС и используется при операциях с файлами. В результате получается, что разреженный файл занимает меньше места на диске (более эффективное использование дискового пространства)
+**Разреженные файлы** - это файлы, для которых выделяется пространство на диске только для участков с ненулевыми данными.
+Список всех "дыр" хранится в метаданных ФС и используется при операциях с файлами.
+В результате получается, что разреженный файл занимает меньше места на диске (более эффективное использование дискового пространства)
 
-
-2. Могут ли файлы, являющиеся жёсткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
+2) Могут ли файлы, являющиеся жёсткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
 
 Не могут, такие жесткие ссылки имеют один и тот же inode (объект, который содержит метаданные файла).
 
-
-3. Сделайте `vagrant destroy` на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
+3) Сделайте `vagrant destroy` на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
 
     ```ruby
     path_to_disk_folder = './disks'
@@ -788,9 +788,7 @@ nicolay@nicolay-VirtualBox:~$ ulimit -u 500
     ```
 
     Эта конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2,5 Гб.
-	
-	
-	
+```bash	
 nicolay@nicolay-VirtualBox:~$ lsblk
 NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 loop0    7:0    0     4K  1 loop /snap/bare/5
@@ -809,12 +807,10 @@ sda      8:0    0    50G  0 disk
 └─sda5   8:5    0  49,5G  0 part /
 sdb      8:16   0   2,5G  0 disk
 sdc      8:32   0   2,5G  0 disk
+```	
 
-	
-	
-
-4. Используя `fdisk`, разбейте первый диск на два раздела: 2 Гб и оставшееся пространство.
-
+4) Используя `fdisk`, разбейте первый диск на два раздела: 2 Гб и оставшееся пространство.
+```bash	
 nicolay@nicolay-VirtualBox:~$ sudo fdisk /dev/sdb
 
 Добро пожаловать в fdisk (util-linux 2.34).
@@ -873,14 +869,10 @@ sdb      8:16   0   2,5G  0 disk
 ├─sdb1   8:17   0     2G  0 part
 └─sdb2   8:18   0   511M  0 part
 sdc      8:32   0   2,5G  0 disk
+```
 
-
-
-
-5. Используя `sfdisk`, перенесите эту таблицу разделов на второй диск.
-
-	
-	
+5) Используя `sfdisk`, перенесите эту таблицу разделов на второй диск.	
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo sfdisk -d /dev/sdb | sudo sfdisk /dev/sdc
 Проверяется, чтобы сейчас никто не использовал этот диск... ОК
 
@@ -933,12 +925,9 @@ sdb      8:16   0   2,5G  0 disk
 sdc      8:32   0   2,5G  0 disk
 ├─sdc1   8:33   0     2G  0 part
 └─sdc2   8:34   0   511M  0 part
-	
-	
-	
-
-6. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
-
+```
+6) Соберите `mdadm` RAID1 на паре разделов 2 Гб.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md0 -l 1 -n 2 /dev/sdb1 /dev/sdc1
 mdadm: Note: this array has metadata at the start and
 may not be suitable as a boot device.  If you plan to
@@ -948,12 +937,9 @@ your boot-loader understands md/v1.x metadata, or use
 Continue creating array? y
 mdadm: Defaulting to version 1.2 metadata
 mdadm: array /dev/md0 started.
-
-
-
-	
-7. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
-
+```
+7) Соберите `mdadm` RAID0 на второй паре маленьких разделов.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo mdadm --create /dev/md1 -l 0 -n 2 /dev/sdb2 /dev/sdc2
 mdadm: Defaulting to version 1.2 metadata
 mdadm: array /dev/md1 started.
@@ -984,11 +970,9 @@ sdc       8:32   0   2,5G  0 disk
 │ └─md0   9:0    0     2G  0 raid1
 └─sdc2    8:34   0   511M  0 part
   └─md1   9:1    0  1018M  0 raid0
-
-
-
-8. Создайте два независимых PV на получившихся md-устройствах.
-
+```
+8) Создайте два независимых PV на получившихся md-устройствах.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo pvcreate /dev/md1 /dev/md0
 Physical volume "/dev/md1" successfully created.
 Physical volume "/dev/md0" successfully created.
@@ -996,12 +980,9 @@ nicolay@nicolay-VirtualBox:~$ sudo pvscan
 PV /dev/md0                      lvm2 [<2,00 GiB]
 PV /dev/md1                      lvm2 [1018,00 MiB]
 Total: 2 [2,99 GiB] / in use: 0 [0   ] / in no VG: 2 [2,99 GiB]
-
-
-
-					     
-9. Создайте общую volume-group на этих двух PV.
-
+```
+9) Создайте общую volume-group на этих двух PV.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo vgcreate VG1 /dev/md0 /dev/md1
 Volume group "VG1" successfully created
 nicolay@nicolay-VirtualBox:~$ sudo vgscan
@@ -1029,10 +1010,9 @@ nicolay@nicolay-VirtualBox:~$ sudo pvdisplay
   Free PE               254
   Allocated PE          0
   PV UUID               9WyUe1-XlOI-IiJg-0nY4-6FtP-s5x5-ZC7Ihz
-
-
-10. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
-
+```
+10) Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo lvcreate -L 100M -n LV1 VG1 /dev/md1
   Logical volume "LV1" created.
 
@@ -1064,10 +1044,9 @@ sdc             8:32   0   2,5G  0 disk
 └─sdc2          8:34   0   511M  0 part
   └─md1         9:1    0  1018M  0 raid0
     └─VG1-LV1 253:0    0   100M  0 lvm
-
-
-11. Создайте `mkfs.ext4` ФС на получившемся LV.
-
+```
+11) Создайте `mkfs.ext4` ФС на получившемся LV.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo mkfs.ext4 /dev/VG1/LV1
 mke2fs 1.45.5 (07-Jan-2020)
 Creating filesystem with 25600 4k blocks and 25600 inodes
@@ -1076,16 +1055,14 @@ Allocating group tables: done
 Сохранение таблицы inod'ов: done
 Создание журнала (1024 блоков): готово
 Writing superblocks and filesystem accounting information: готово
-
-
-12. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
-
+```
+12) Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
+```bash
 nicolay@nicolay-VirtualBox:~$ mkdir /tmp/new
 nicolay@nicolay-VirtualBox:~$ sudo mount /dev/VG1/LV1 /tmp/new
-
-
-13. Поместите туда тестовый файл, например, `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
-
+```
+13) Поместите туда тестовый файл, например, `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
 --2023-03-26 19:54:15--  https://mirror.yandex.ru/ubuntu/ls-lR.gz
 Распознаётся mirror.yandex.ru (mirror.yandex.ru)… 213.180.204.183, 2a02:6b8::183
@@ -1097,10 +1074,9 @@ HTTP-запрос отправлен. Ожидание ответа… 200 OK
 /tmp/new/test.gz                      100%[======================================================================>]  23,45M  4,89MB/s    за 4,8s
 
 2023-03-26 19:54:20 (4,85 MB/s) - «/tmp/new/test.gz» сохранён [24587067/24587067]
-
-
-14. Прикрепите вывод `lsblk`.
-
+```
+14) Прикрепите вывод `lsblk`.
+```bash
 nicolay@nicolay-VirtualBox:~$ lsblk
 NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 loop0           7:0    0     4K  1 loop  /snap/bare/5
@@ -1129,23 +1105,21 @@ sdc             8:32   0   2,5G  0 disk
 └─sdc2          8:34   0   511M  0 part
   └─md1         9:1    0  1018M  0 raid0
     └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
+```
+15) Протестируйте целостность файла:
 
-
-15. Протестируйте целостность файла:
-
-    ```bash
-    root@vagrant:~# gzip -t /tmp/new/test.gz
-    root@vagrant:~# echo $?
-    0
-    ```
+```bash
+root@vagrant:~# gzip -t /tmp/new/test.gz
+root@vagrant:~# echo $?
+0
+```
+```bash
 nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
 nicolay@nicolay-VirtualBox:~$ echo $?
 0
-
-
-
-16. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
-
+```
+16) Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo pvmove /dev/md1 /dev/md0
   /dev/md1: Moved: 4,00%
   /dev/md1: Moved: 100,00%
@@ -1177,15 +1151,14 @@ sdc             8:32   0   2,5G  0 disk
 │   └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
 └─sdc2          8:34   0   511M  0 part
   └─md1         9:1    0  1018M  0 raid0
-
-17. Сделайте `--fail` на устройство в вашем RAID1 md.
-
+```
+17) Сделайте `--fail` на устройство в вашем RAID1 md.
+```bash
 nicolay@nicolay-VirtualBox:~$ sudo mdadm /dev/md0 -f /dev/sdc1
 mdadm: set /dev/sdc1 faulty in /dev/md0
-
-
-18. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
-
+```
+18) Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
+```bash
 [ 1014.562238] md/raid1:md0: not clean -- starting background reconstruction
 [ 1014.562247] md/raid1:md0: active with 2 out of 2 mirrors
 [ 1014.562331] md0: detected capacity change from 0 to 4188160
@@ -1199,21 +1172,20 @@ mdadm: set /dev/sdc1 faulty in /dev/md0
 [ 2459.640995] dm-1: detected capacity change from 204800 to 8192
 [ 2623.941318] md/raid1:md0: Disk failure on sdc1, disabling device.
                md/raid1:md0: Operation continuing on 1 devices.
+```
+19) Протестируйте целостность файла — он должен быть доступен несмотря на «сбойный» диск:
 
-19. Протестируйте целостность файла — он должен быть доступен несмотря на «сбойный» диск:
-
-    ```bash
-    root@vagrant:~# gzip -t /tmp/new/test.gz
-    root@vagrant:~# echo $?
-    0
-    ```
-
+```bash
+root@vagrant:~# gzip -t /tmp/new/test.gz
+root@vagrant:~# echo $?
+0
+```
+```bash
 nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
 nicolay@nicolay-VirtualBox:~$ echo $?
 0
-
-
-20. Погасите тестовый хост — `vagrant destroy`.
+```
+20) Погасите тестовый хост — `vagrant destroy`.
  
 *В качестве решения пришлите ответы на вопросы и опишите, как они были получены.*
 
