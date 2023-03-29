@@ -1107,12 +1107,6 @@ sdc             8:32   0   2,5G  0 disk
     └─VG1-LV1 253:0    0   100M  0 lvm   /tmp/new
 ```
 15) Протестируйте целостность файла:
-
-```bash
-root@vagrant:~# gzip -t /tmp/new/test.gz
-root@vagrant:~# echo $?
-0
-```
 ```bash
 nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
 nicolay@nicolay-VirtualBox:~$ echo $?
@@ -1174,12 +1168,6 @@ mdadm: set /dev/sdc1 faulty in /dev/md0
                md/raid1:md0: Operation continuing on 1 devices.
 ```
 19) Протестируйте целостность файла — он должен быть доступен несмотря на «сбойный» диск:
-
-```bash
-root@vagrant:~# gzip -t /tmp/new/test.gz
-root@vagrant:~# echo $?
-0
-```
 ```bash
 nicolay@nicolay-VirtualBox:~$ gzip -t /tmp/new/test.gz
 nicolay@nicolay-VirtualBox:~$ echo $?
