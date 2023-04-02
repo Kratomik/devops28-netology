@@ -1197,3 +1197,272 @@ nicolay@nicolay-VirtualBox:~$ echo $?
 
 * задание выполнено частично или не выполнено вообще;
 * в логике выполнения заданий есть противоречия и существенные недостатки. 
+
+
+
+	
+# Домашнее задание к занятию «Компьютерные сети. Лекция 1»
+
+### Цель задания
+
+В результате выполнения задания вы: 
+
+* научитесь работать с HTTP-запросами, чтобы увидеть, как клиенты взаимодействуют с серверами по этому протоколу;
+* поработаете с сетевыми утилитами, чтобы разобраться, как их можно использовать для отладки сетевых запросов, соединений.
+
+### Чеклист готовности к домашнему заданию
+
+1. Убедитесь, что у вас установлены необходимые сетевые утилиты — dig, traceroute, mtr, telnet.
+2. Используйте `apt install` для установки пакетов.
+
+
+### Инструкция к заданию
+
+1. Создайте .md-файл для ответов на вопросы задания в своём репозитории, после выполнения прикрепите ссылку на него в личном кабинете.
+2. Любые вопросы по выполнению заданий задавайте в чате учебной группы или в разделе «Вопросы по заданию» в личном кабинете.
+
+
+### Дополнительные материалы для выполнения задания
+
+1. Полезным дополнением к обозначенным выше утилитам будет пакет net-tools. Установить его можно с помощью команды `apt install net-tools`.
+2. RFC протокола HTTP/1.0, в частности [страница с кодами ответа](https://www.rfc-editor.org/rfc/rfc1945#page-32).
+3. [Ссылки на другие RFC для HTTP](https://blog.cloudflare.com/cloudflare-view-http3-usage/).
+
+------
+
+## Задание
+
+**Шаг 1.** Работа c HTTP через telnet.
+
+- Подключитесь утилитой telnet к сайту stackoverflow.com:
+
+`telnet stackoverflow.com 80`
+ 
+- Отправьте HTTP-запрос:
+
+```bash
+nicolay@nicolay-VirtualBox:/etc$ telnet stackoverflow.com 80
+Trying 151.101.1.69...
+Connected to stackoverflow.com.
+Escape character is '^]'.
+GET /questions HTTP/1.0
+HOST: stackoverflow.com
+
+HTTP/1.1 403 Forbidden
+Connection: close
+Content-Length: 1921
+Server: Varnish
+Retry-After: 0
+Content-Type: text/html
+Accept-Ranges: bytes
+Date: Sun, 02 Apr 2023 04:21:16 GMT
+Via: 1.1 varnish
+X-Served-By: cache-fra-eddf8230037-FRA
+X-Cache: MISS
+X-Cache-Hits: 0
+X-Timer: S1680409277.841161,VS0,VE1
+X-DNS-Prefetch-Control: off
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Forbidden - Stack Exchange</title>
+    <style type="text/css">
+                body
+                {
+                        color: #333;
+                        font-family: 'Helvetica Neue', Arial, sans-serif;
+                        font-size: 14px;
+                        background: #fff url('img/bg-noise.png') repeat left top;
+                        line-height: 1.4;
+                }
+                h1
+                {
+                        font-size: 170%;
+                        line-height: 34px;
+                        font-weight: normal;
+                }
+                a { color: #366fb3; }
+                a:visited { color: #12457c; }
+                .wrapper {
+                        width:960px;
+                        margin: 100px auto;
+                        text-align:left;
+                }
+                .msg {
+                        float: left;
+                        width: 700px;
+                        padding-top: 18px;
+                        margin-left: 18px;
+                }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+                <div style="float: left;">
+                        <img src="https://cdn.sstatic.net/stackexchange/img/apple-touch-icon.png" alt="Stack Exchange" />
+                </div>
+                <div class="msg">
+                        <h1>Access Denied</h1>
+                        <p>This IP address (95.170.131.174) has been blocked from access to our services. If you believe this to be in error, please contact us at <a href="mailto:team@stackexchange.com?Subject=Blocked%2095.170.131.174%20(Request%20ID%3A%20967390246-FRA)">team@stackexchange.com</a>.</p>
+                        <p>When contacting us, please include the following information in the email:</p>
+                        <p>Method: block</p>
+                        <p>XID: 967390246-FRA</p>
+                        <p>IP: 95.170.131.174</p>
+                        <p>X-Forwarded-For: </p>
+                        <p>User-Agent: </p>
+
+                        <p>Time: Sun, 02 Apr 2023 04:21:16 GMT</p>
+                        <p>URL: stackoverflow.com/questions</p>
+                        <p>Browser Location: <span id="jslocation">(not loaded)</span></p>
+                </div>
+        </div>
+        <script>document.getElementById('jslocation').innerHTML = window.location.href;</script>
+</body>
+</html>Connection closed by foreign host.
+
+```
+*Получен ответ HTTP/1.1 403 Forbidden. Доступ к запрошенному ресурсу запрещён.*
+	
+**Шаг 2.** Повторите задание 1 в браузере, используя консоль разработчика F12:
+Первый ответ сервера HTTP 307 Internal Redirect
+```bash
+URL запроса: http://stackoverflow.com/
+Метод запроса: GET
+Код статуса: 307 Internal Redirect
+Правило для URL перехода: strict-origin-when-cross-origin
+Location: https://stackoverflow.com/
+Non-Authoritative-Reason: HSTS
+```
+Этот код означает, что ресурс был временно перемещён в URL, указанный в Location (https://stackoverflow.com/). При этом для перенаправленного запроса тело и метод запроса не будут изменены.
+```bash	
+Страница была загружена за 1.07 сек Самый долгий запрос
+https://cdn.sstatic.net/Img/product/teams/microsoft-integration/microsoft-teams-logo.svg?v=00361aadd408
+```
+```bash
+![image](https://user-images.githubusercontent.com/126371658/229333193-f77a05dd-65b8-405b-80a2-4f1bbe17fcd5.png)
+```
+**Шаг 3.** Какой IP-адрес у вас в интернете?
+Из сооброжений безопасности полный ip говорить не буду хоть он и не белый
+37.78.х.х
+
+**Шаг 4.** Какому провайдеру принадлежит ваш IP-адрес? Какой автономной системе AS? Воспользуйтесь утилитой `whois`.
+Провайдер "Ростелеком", AS12389
+```bash
+nicolay@nicolay-VirtualBox:~$ whois -h whois.radb.net 37.78.x.x
+route:          37.78.0.0/16
+descr:          PAO Rostelecom, Macroregional Branch South, Krasnodar, BRAS
+origin:         AS12389
+mnt-by:         STC-MNT
+mnt-by:         ROSTELECOM-MNT
+created:        2015-11-24T04:39:44Z
+last-modified:  2015-11-24T04:39:44Z
+source:         RIPE
+remarks:        ****************************
+remarks:        * THIS OBJECT IS MODIFIED
+remarks:        * Please note that all data that is generally regarded as personal
+remarks:        * data has been removed from this object.
+remarks:        * To view the original object, please query the RIPE Database at:
+remarks:        * http://www.ripe.net/whois
+remarks:        ****************************
+```
+**Шаг 5.** Через какие сети проходит пакет, отправленный с вашего компьютера на адрес 8.8.8.8? Через какие AS? Воспользуйтесь утилитой `traceroute`.
+```bash
+nicolay@nicolay-VirtualBox:~$ traceroute -AnI 8.8.8.8
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  192.168.13.254 [*]  8.850 ms  0.695 ms  0.824 ms
+ 2  192.168.15.253 [*]  0.723 ms  0.618 ms  0.684 ms
+ 3  91.201.72.225 [AS25549]  1.977 ms  1.994 ms  1.674 ms
+ 4  10.128.24.145 [*]  1.342 ms  1.506 ms  3.280 ms
+ 5  194.226.100.92 [*]  155.371 ms  154.865 ms  154.508 ms
+ 6  74.125.244.180 [AS15169]  55.283 ms  55.559 ms  55.216 ms
+ 7  216.239.48.163 [AS15169]  64.993 ms  64.673 ms  64.350 ms
+ 8  172.253.51.223 [AS15169]  60.652 ms  60.333 ms  60.012 ms
+ 9  * * *
+10  * * *
+11  * * *
+12  * * *
+13  * * *
+14  * * *
+15  * * *
+16  * * *
+17  * * *
+18  * * *
+19  * * *
+20  8.8.8.8 [AS15169/AS263411]  58.428 ms  59.819 ms  58.795 ms
+```
+
+**Шаг 6.** Повторите задание 5 в утилите `mtr`. На каком участке наибольшая задержка — delay?
+```bash
+nicolay-VirtualBox (192.168.12.200)                                                                                         2023-04-02T13:08:31+0700
+Keys:  Help   Display mode   Restart statistics   Order of fields   quit
+                                                                                                            Packets               Pings
+ Host                                                                                                     Loss%   Snt   Last   Avg  Best  Wrst StDev
+ 1. AS???    192.168.13.254                                                                                0.0%    13    0.7  13.5   0.7  72.5  25.2
+ 2. AS???    192.168.15.253                                                                                0.0%    13    0.8   1.1   0.7   3.5   0.8
+ 3. AS25549  91.201.72.225                                                                                 0.0%    13    1.5   1.8   1.4   2.6   0.3
+ 4. AS???    10.128.24.145                                                                                 0.0%    13    2.3   1.7   1.3   2.3   0.3
+ 5. AS???    194.226.100.92                                                                                0.0%    12   55.6  55.9  55.1  61.4   1.8
+ 6. AS15169  74.125.244.180                                                                                0.0%    12   55.4  57.1  55.3  63.5   2.8
+ 7. AS15169  216.239.48.163                                                                                0.0%    12   58.0 507.7  57.0 1695. 651.5
+ 8. AS15169  172.253.51.223                                                                                0.0%    12   59.9  60.1  59.8  60.6   0.3
+ 9. (waiting for reply)
+10. (waiting for reply)
+11. (waiting for reply)
+12. (waiting for reply)
+13. (waiting for reply)
+14. (waiting for reply)
+15. (waiting for reply)
+16. (waiting for reply)
+17. (waiting for reply)
+18. (waiting for reply)
+19. (waiting for reply)
+20. AS15169  8.8.8.8                                                                                       0.0%    12   58.8  58.8  58.4  60.7   0.6
+```
+Небольшая задержка на AS15169  172.253.51.223
+
+**Шаг 7.** Какие DNS-сервера отвечают за доменное имя dns.google? Какие A-записи? Воспользуйтесь утилитой `dig`.
+```bash
+nicolay@nicolay-VirtualBox:~$  dig +short NS dns.google
+ns1.zdns.google.
+ns2.zdns.google.
+ns3.zdns.google.
+ns4.zdns.google.
+	
+nicolay@nicolay-VirtualBox:~$  dig +short A dns.google
+8.8.4.4
+8.8.8.8
+```
+
+**Шаг 8.** Проверьте PTR записи для IP-адресов из задания 7. Какое доменное имя привязано к IP? Воспользуйтесь утилитой `dig`.
+```bash
+nicolay@nicolay-VirtualBox:~$ dig +noall +answer -x 8.8.8.8
+8.8.8.8.in-addr.arpa.   5999    IN      PTR     dns.google.
+
+nicolay@nicolay-VirtualBox:~$ dig +noall +answer -x 8.8.4.4
+4.4.8.8.in-addr.arpa.   85576   IN      PTR     dns.google.
+```
+
+*В качестве ответов на вопросы приложите лог выполнения команд в консоли или скриншот полученных результатов.*
+
+----
+
+### Правила приёма домашнего задания
+
+В личном кабинете отправлена ссылка на .md-файл в вашем репозитории.
+
+
+### Критерии оценки
+
+Зачёт:
+
+* выполнены все задания;
+* ответы даны в развёрнутой форме;
+* приложены соответствующие скриншоты и файлы проекта;
+* в выполненных заданиях нет противоречий и нарушения логики.
+
+На доработку:
+
+* задание выполнено частично или не выполнено вообще;
+* в логике выполнения заданий есть противоречия и существенные недостатки.
