@@ -1340,9 +1340,6 @@ Non-Authoritative-Reason: HSTS
 Страница была загружена за 1.07 сек Самый долгий запрос
 https://cdn.sstatic.net/Img/product/teams/microsoft-integration/microsoft-teams-logo.svg?v=00361aadd408
 ```
-```bash
-![image](https://user-images.githubusercontent.com/126371658/229333193-f77a05dd-65b8-405b-80a2-4f1bbe17fcd5.png)
-```
 **Шаг 3.** Какой IP-адрес у вас в интернете?
 Из сооброжений безопасности полный ip говорить не буду хоть он и не белый
 37.78.х.х
