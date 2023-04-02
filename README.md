@@ -1340,6 +1340,8 @@ Non-Authoritative-Reason: HSTS
 Страница была загружена за 1.07 сек Самый долгий запрос
 https://cdn.sstatic.net/Img/product/teams/microsoft-integration/microsoft-teams-logo.svg?v=00361aadd408
 ```
+Скриншот приложен в файле Итог ДЗ-компьтерные сети лекция 1
+	
 **Шаг 3.** Какой IP-адрес у вас в интернете?
 Из сооброжений безопасности полный ip говорить не буду хоть он и не белый
 37.78.х.х
