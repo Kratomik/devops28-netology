@@ -1806,8 +1806,10 @@ nicolay@nicolay-VirtualBox:~$ python3 ./3.py /home/nicolay/Documents/py/devops28
 import socket
 import json
 
+print('read ip_add.log ...')
 file_old = open('ip_add.log', 'r')
 stage_ipadds = json.loads(file_old.read())
+print(f'ip_add.log: {stage_ipadds}\n')
 
 ip_item = []
 dns_item = ["drive.google.com", "mail.google.com", "google.com"]
@@ -1821,7 +1823,6 @@ stage_ipadds_new.close()
 
 print('For check:')
 print(current_ipadds)
-print(f'{stage_ipadds}\n')
 
 for i in current_ipadds:
     if (current_ipadds[i] == stage_ipadds[i]):
