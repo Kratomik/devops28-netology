@@ -69,8 +69,16 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 ```
 4. Раскомментируйте блок кода, примерно расположенный на строчках 29-42 файла **main.tf**.
 Выполните команду ```terraform validate```. Объясните в чем заключаются намеренно допущенные ошибки? Исправьте их.
-- Ответ:
+- Ответ: Недопустимое имя ресурса. Имя должно начинаться с буквы или символа подчеркивания и может содержать только буквы, цифры, символы подчеркивания и тире.
 ```Bash
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ terraform validate
+╷
+│ Error: Invalid resource name
+│
+│   on main.tf line 28, in resource "docker_container" "1nginx":
+│   28: resource "docker_container" "1nginx" {
+│
+│ A name must start with a letter or underscore and may contain only letters, digits, underscores, and dashes.
 
 ```
 5. Выполните код. В качестве ответа приложите вывод команды ```docker ps```
