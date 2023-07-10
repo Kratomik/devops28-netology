@@ -34,6 +34,7 @@ nicolay@nicolay-VirtualBox:~$
 ### Задание 1
 
 1. Перейдите в каталог [**src**](https://github.com/netology-code/ter-homeworks/tree/main/01/src). Скачайте все необходимые зависимости, использованные в проекте. 
+- Ответ:
 ```Bash
 nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
