@@ -69,17 +69,7 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 ```
 4. Раскомментируйте блок кода, примерно расположенный на строчках 29-42 файла **main.tf**.
 Выполните команду ```terraform validate```. Объясните в чем заключаются намеренно допущенные ошибки? Исправьте их.
-- Ответ: Недопустимое имя ресурса. Имя должно начинаться с буквы или символа подчеркивания и может содержать только буквы, цифры, символы подчеркивания и тире.
-```Bash
-nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ terraform validate
-╷
-│ Error: Invalid resource name
-│
-│   on main.tf line 28, in resource "docker_container" "1nginx":
-│   28: resource "docker_container" "1nginx" {
-│
-│ A name must start with a letter or underscore and may contain only letters, digits, underscores, and dashes.
-```
+- Ответ: Недопустимое имя ресурса - имя должно начинаться с буквы или символа подчеркивания и может содержать только буквы, цифры, символы подчеркивания и тире, необъявленная переменная окружения в имени контейнера - в качестве исправления указал имя контейнера "terraform_nginx"
 5. Выполните код. В качестве ответа приложите вывод команды ```docker ps```
 - Ответ:
 ```Bash
@@ -91,8 +81,12 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 ```
 6. Замените имя docker-контейнера в блоке кода на ```hello_world```, выполните команду ```terraform apply -auto-approve```.
 Объясните своими словами, в чем может быть опасность применения ключа  ```-auto-approve``` ? В качестве ответа дополнительно приложите вывод команды ```docker ps```
-- Ответ:
+- Ответ: При применение ключа перестает выводить и спрашивать сообщение о применение изменения, т.е вавтоматическом режиме применяет конфигурацию. В таком случае если в коде закралась ошибка, то исправить её на данном этапе не предоставится возможным. 
 ```Bash
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                  NAMES
+1c72d9d251ba   021283c8eb95   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   0.0.0.0:8000->80/tcp   hello_world
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 
 ```
 7. Уничтожьте созданные ресурсы с помощью **terraform**. Убедитесь, что все ресурсы удалены. Приложите содержимое файла **terraform.tfstate**. 
