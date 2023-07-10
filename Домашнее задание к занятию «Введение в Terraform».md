@@ -34,6 +34,30 @@ nicolay@nicolay-VirtualBox:~$
 ### Задание 1
 
 1. Перейдите в каталог [**src**](https://github.com/netology-code/ter-homeworks/tree/main/01/src). Скачайте все необходимые зависимости, использованные в проекте. 
+```Bash
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of kreuzwerker/docker from the dependency lock file
+- Reusing previous version of hashicorp/random from the dependency lock file
+- Using previously-installed kreuzwerker/docker v3.0.2
+- Using previously-installed hashicorp/random v3.5.1
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
+```
 2. Изучите файл **.gitignore**. В каком terraform файле согласно этому .gitignore допустимо сохранить личную, секретную информацию?
 3. Выполните код проекта. Найдите  в State-файле секретное содержимое созданного ресурса **random_password**, пришлите в качестве ответа конкретный ключ и его значение.
 4. Раскомментируйте блок кода, примерно расположенный на строчках 29-42 файла **main.tf**.
