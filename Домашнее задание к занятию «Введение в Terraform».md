@@ -63,9 +63,9 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 - Ответ:
 Сохранить личную, секретную информацию согласно .gitignore допустимо в файлах *.tfstate
 3. Выполните код проекта. Найдите  в State-файле секретное содержимое созданного ресурса **random_password**, пришлите в качестве ответа конкретный ключ и его значение.
-- Ответ:
+- Ответ: id - это id сервисного аккаунта в yandex cloud.
 ```Bash
-
+"id": "none"
 ```
 4. Раскомментируйте блок кода, примерно расположенный на строчках 29-42 файла **main.tf**.
 Выполните команду ```terraform validate```. Объясните в чем заключаются намеренно допущенные ошибки? Исправьте их.
@@ -87,12 +87,19 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ docker ps
 CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                  NAMES
 1c72d9d251ba   021283c8eb95   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   0.0.0.0:8000->80/tcp   hello_world
 nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
-
 ```
 7. Уничтожьте созданные ресурсы с помощью **terraform**. Убедитесь, что все ресурсы удалены. Приложите содержимое файла **terraform.tfstate**. 
 - Ответ:
 ```Bash
-
+{
+  "version": 4,
+  "terraform_version": "1.4.6",
+  "serial": 35,
+  "lineage": "1cf12d0a-38e6-05b3-9d5b-cb2235a8d53a",
+  "outputs": {},
+  "resources": [],
+  "check_results": null
+}
 ```
 8. Объясните, почему при этом не был удален docker образ **nginx:latest** ? Ответ подкрепите выдержкой из документации провайдера.
 - Ответ:
