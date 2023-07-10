@@ -10,6 +10,16 @@
 ### Чеклист готовности к домашнему заданию
 
 1. Скачайте и установите актуальную версию **terraform** >=1.4.X . Приложите скриншот вывода команды ```terraform --version```.
+```Bash
+nicolay@nicolay-VirtualBox:~$
+nicolay@nicolay-VirtualBox:~$ terraform --version
+Terraform v1.4.6
+on linux_amd64
+
+Your version of Terraform is out of date! The latest version
+is 1.5.2. You can update by downloading from https://www.terraform.io/downloads.html
+nicolay@nicolay-VirtualBox:~$
+```
 2. Скачайте на свой ПК данный git репозиторий. Исходный код для выполнения задания расположен в директории **01/src**.
 3. Убедитесь, что в вашей ОС установлен docker.
 
