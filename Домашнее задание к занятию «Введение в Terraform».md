@@ -79,12 +79,15 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ terraform validate
 │   28: resource "docker_container" "1nginx" {
 │
 │ A name must start with a letter or underscore and may contain only letters, digits, underscores, and dashes.
-
 ```
 5. Выполните код. В качестве ответа приложите вывод команды ```docker ps```
 - Ответ:
 ```Bash
-
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$ docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                  NAMES
+d5c000f0ff3c   021283c8eb95   "/docker-entrypoint.…"   19 seconds ago   Up 12 seconds   0.0.0.0:8000->80/tcp   terraform_nginx
+nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 ```
 6. Замените имя docker-контейнера в блоке кода на ```hello_world```, выполните команду ```terraform apply -auto-approve```.
 Объясните своими словами, в чем может быть опасность применения ключа  ```-auto-approve``` ? В качестве ответа дополнительно приложите вывод команды ```docker ps```
