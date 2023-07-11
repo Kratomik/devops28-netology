@@ -61,11 +61,50 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/01/src$
 ```
 2. Изучите файл **.gitignore**. В каком terraform файле согласно этому .gitignore допустимо сохранить личную, секретную информацию?
 - Ответ:
-Сохранить личную, секретную информацию согласно .gitignore допустимо в файле personal.auto.tfvars
+Сохранить личную, секретную информацию согласно .gitignore допустимо в файле **personal.auto.tfvars**
 3. Выполните код проекта. Найдите  в State-файле секретное содержимое созданного ресурса **random_password**, пришлите в качестве ответа конкретный ключ и его значение.
-- Ответ: id - это id сервисного аккаунта в yandex cloud.
+- Ответ: В данном содержимом state файла нет секретного содержимого, так как мы ни каких токенов и паролей не передаем для развертывания. Если я не прав можете чуть больше информации дать, к примеру где я могу найти информацию по этому поводу или может я что-то не так делаю. Ниже приведено полное содержимое файла **terraform.tfstate**
 ```Bash
-"id": "none"
+{
+  "version": 4,
+  "terraform_version": "1.4.6",
+  "serial": 93,
+  "lineage": "1cf12d0a-38e6-05b3-9d5b-cb2235a8d53a",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "random_password",
+      "name": "random_string",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]",
+      "instances": [
+        {
+          "schema_version": 3,
+          "attributes": {
+            "bcrypt_hash": "$2a$10$N6NEh5miZWJBbYYslidHauFw6fLq1ntaKLoXaJWOAngbzVdoVoMqS",
+            "id": "none",
+            "keepers": null,
+            "length": 16,
+            "lower": true,
+            "min_lower": 1,
+            "min_numeric": 1,
+            "min_special": 0,
+            "min_upper": 1,
+            "number": true,
+            "numeric": true,
+            "override_special": null,
+            "result": "fqzD4tXMtX3wmTZD",
+            "special": false,
+            "upper": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+
 ```
 4. Раскомментируйте блок кода, примерно расположенный на строчках 29-42 файла **main.tf**.
 Выполните команду ```terraform validate```. Объясните в чем заключаются намеренно допущенные ошибки? Исправьте их.
