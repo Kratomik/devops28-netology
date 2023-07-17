@@ -109,10 +109,7 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
 ```Bash
 nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$ terraform apply
 data.yandex_compute_image.ubuntu: Reading...
-yandex_vpc_network.develop: Refreshing state... [id=enpuqtagudah1ufl4q54]
-data.yandex_compute_image.ubuntu: Read complete after 2s [id=fd85f37uh98ldl1omk30]
-yandex_vpc_subnet.develop: Refreshing state... [id=e9b3kuqst5363mhu677p]
-yandex_compute_instance.platform: Refreshing state... [id=fhmkjpj7p1nbihkejnu5]
+data.yandex_compute_image.ubuntu: Read complete after 1s [id=fd85f37uh98ldl1omk30]
 
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
   + create
@@ -166,7 +163,7 @@ Terraform will perform the following actions:
           + nat_ip_address     = (known after apply)
           + nat_ip_version     = (known after apply)
           + security_group_ids = (known after apply)
-          + subnet_id          = "e9b3kuqst5363mhu677p"
+          + subnet_id          = (known after apply)
         }
 
       + resources {
@@ -180,8 +177,8 @@ Terraform will perform the following actions:
         }
     }
 
-  # yandex_vpc_network.develop-1 will be created
-  + resource "yandex_vpc_network" "develop-1" {
+  # yandex_vpc_network.develop will be created
+  + resource "yandex_vpc_network" "develop" {
       + created_at                = (known after apply)
       + default_security_group_id = (known after apply)
       + folder_id                 = (known after apply)
@@ -191,14 +188,14 @@ Terraform will perform the following actions:
       + subnet_ids                = (known after apply)
     }
 
-  # yandex_vpc_subnet.develop-1 will be created
-  + resource "yandex_vpc_subnet" "develop-1" {
+  # yandex_vpc_subnet.develop will be created
+  + resource "yandex_vpc_subnet" "develop" {
       + created_at     = (known after apply)
       + folder_id      = (known after apply)
       + id             = (known after apply)
       + labels         = (known after apply)
       + name           = "develop"
-      + network_id     = "enpuqtagudah1ufl4q54"
+      + network_id     = (known after apply)
       + v4_cidr_blocks = [
           + "10.0.1.0/24",
         ]
@@ -213,6 +210,7 @@ Do you want to perform these actions?
   Only 'yes' will be accepted to approve.
 
   Enter a value: yes
+
 yandex_vpc_network.develop: Creating...
 yandex_vpc_network.develop: Creation complete after 2s [id=enpenni0f93on8j22530]
 yandex_vpc_subnet.develop: Creating...
