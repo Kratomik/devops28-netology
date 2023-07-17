@@ -71,7 +71,21 @@ Error: Error while requesting API to create instance: server-request-id = dc1c64
 2. Объявите нужные переменные в файле variables.tf, обязательно указывайте тип переменной. Заполните их **default** прежними значениями из main.tf. 
 3. Проверьте terraform plan (изменений быть не должно). 
 
+**Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$ terraform plan
+data.yandex_compute_image.ubuntu: Reading...
+yandex_vpc_network.develop: Refreshing state... [id=enpuqtagudah1ufl4q54]
+data.yandex_compute_image.ubuntu: Read complete after 1s [id=fd85f37uh98ldl1omk30]
+yandex_vpc_subnet.develop: Refreshing state... [id=e9b3kuqst5363mhu677p]
+yandex_compute_instance.platform: Refreshing state... [id=fhmkjpj7p1nbihkejnu5]
 
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
+```
 ### Задание 3
 
 1. Создайте в корне проекта файл 'vms_platform.tf' . Перенесите в него все переменные первой ВМ.
