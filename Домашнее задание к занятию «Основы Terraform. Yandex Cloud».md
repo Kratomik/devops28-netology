@@ -73,6 +73,19 @@ Error: Error while requesting API to create instance: server-request-id = dc1c64
 
 **Ответ:**
 ```Bash
+data "yandex_compute_image" "ubuntu" {
+  family = var.vm_web_family
+}
+resource "yandex_compute_instance" "platform" {
+  name        = var.vm_web_name
+  platform_id = var.vm_web_platform_id
+  resources {
+    cores         = var.vm_veb_cores
+    memory        = var.vm_veb_memory
+    core_fraction = var.vm_veb_core_fraction
+  }
+```
+```Bash
 nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
 nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$ terraform plan
 data.yandex_compute_image.ubuntu: Reading...
