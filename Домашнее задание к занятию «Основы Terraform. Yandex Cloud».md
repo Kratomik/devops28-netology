@@ -36,7 +36,7 @@ https://console.cloud.yandex.ru/folders/<ваш cloud_id>/vpc/security-groups.
 - ответы на вопросы.
 
 **Ответ:**
-- Первая ошибка с которой я столкнулся является выбором платформы для виртуальной машины. В файле **main.tf, platform_id = "standart-v4"** - данной платформы не существует в YC, о чем свидетельствует ошибка ниже. Поэтому данную ошибку исправил на **platform_id = "standart-v1"**
+- Первая ошибка с которой я столкнулся является выбором платформы для виртуальной машины. В файле **main.tf, platform_id = "standart-v4"** - данной платформы не существует в YC, о чем свидетельствует ошибка ниже. Поэтому данную ошибку исправил на **platform_id = "standard-v1"**
 ```Bash
 Error: Error while requesting API to create instance: server-request-id = eded20e0-b3dc-4e67-a4bd-3c18119a1746 server-trace-id = 4bec36205e9578b:acfc731602d6358:4bec36205e9578b:1 client-request-id = d8251740-64b2-4cd7-8161-fbe5de2a3f81 client-trace-id = 7f93740c-a6b6-4787-b036-539ddc9bd7f4 rpc error: code = FailedPrecondition desc = Platform "standart-v4" not found
 │
