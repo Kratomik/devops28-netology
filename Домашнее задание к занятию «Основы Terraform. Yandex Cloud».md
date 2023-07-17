@@ -49,6 +49,7 @@ Error: Error while requesting API to create instance: server-request-id = dc1c64
 
 В качестве решения приложите:
 - скриншот ЛК Yandex Cloud с созданной ВМ,
+![img.png](screen/screen-10.png)
 - скриншот успешного подключения к консоли ВМ через ssh(к OS ubuntu необходимо подключаться под пользователем ubuntu: "ssh ubuntu@vm_ip_address"),
 - ответы на вопросы.
 
