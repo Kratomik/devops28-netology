@@ -258,6 +258,16 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
 
 1. Вместо использования 3-х переменных  ".._cores",".._memory",".._core_fraction" в блоке  resources {...}, объедените их в переменные типа **map** с именами "vm_web_resources" и "vm_db_resources". В качестве продвинутой практики попробуйте создать одну map переменную **vms_resources** и уже внутри нее конфиги обеих ВМ(вложенный map).
 2. Так же поступите с блоком **metadata {serial-port-enable, ssh-keys}**, эта переменная должна быть общая для всех ваших ВМ.
+**Ответ:**
+В данном задании получа ошибку, **здесь нельзя использовать переменные** о чем свидетельствует ошибка ниже. Поэтому возвращаю в рабочий вариант.
+```Bash
+ Error: Variables not allowed
+│
+│   on variables.tf line 95, in variable "metadata":
+│   95:     ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
+│
+│ Variables may not be used here.
+```
 3. Найдите и удалите все более не используемые переменные проекта.
 4. Проверьте terraform plan (изменений быть не должно).
 
