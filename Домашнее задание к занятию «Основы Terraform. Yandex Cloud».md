@@ -28,13 +28,6 @@ https://console.cloud.yandex.ru/folders/<ваш cloud_id>/vpc/security-groups.
 2. Переименуйте файл personal.auto.tfvars_example в personal.auto.tfvars. Заполните переменные (идентификаторы облака, токен доступа). Благодаря .gitignore этот файл не попадет в публичный репозиторий. **Вы можете выбрать иной способ безопасно передать секретные данные в terraform.**
 3. Сгенерируйте или используйте свой текущий ssh ключ. Запишите его открытую часть в переменную **vms_ssh_root_key**.
 4. Инициализируйте проект, выполните код. Исправьте намеренное допущенные ошибки. Ответьте в чем заключается их суть?
-5. Ответьте, как в процессе обучения могут пригодиться параметры```preemptible = true``` и ```core_fraction=5``` в параметрах ВМ? Ответ в документации Yandex cloud.
-
-В качестве решения приложите:
-- скриншот ЛК Yandex Cloud с созданной ВМ,
-- скриншот успешного подключения к консоли ВМ через ssh(к OS ubuntu необходимо подключаться под пользователем ubuntu: "ssh ubuntu@vm_ip_address"),
-- ответы на вопросы.
-
 **Ответ:**
 - Первая ошибка с которой я столкнулся является выбором платформы для виртуальной машины. В файле **main.tf, platform_id = "standart-v4"** - данной платформы не существует в YC, о чем свидетельствует ошибка ниже. Поэтому данную ошибку исправил на **platform_id = "standard-v1"**
 ```Bash
@@ -44,6 +37,21 @@ Error: Error while requesting API to create instance: server-request-id = eded20
 │   on main.tf line 15, in resource "yandex_compute_instance" "platform":
 │   15: resource "yandex_compute_instance" "platform" {
 ```
+- Вторая ошибка с которой я столкнулся заключается в неверном указании количестве ядер, о чем свидетельствует ошибка ниже. В данной платформе что я выбрал выше, допустимое колчество ядер 2, 4. В файле **main.tf** параметр **cores = 1**, меняем данное значение на **cores = 2**
+```Bash
+Error: Error while requesting API to create instance: server-request-id = dc1c6455-2905-44f6-97bc-7fac497cb236 server-trace-id = a66a63d217aa6e24:714ed4cd2fef2b81:a66a63d217aa6e24:1 client-request-id = 1cb22296-3f6a-4418-85a1-8b070e2f93a4 client-trace-id = 65d96f20-8741-468a-94c8-91c8111662a6 rpc error: code = InvalidArgument desc = the specified number of cores is not available on platform "standard-v1"; allowed core number: 2, 4
+│
+│   with yandex_compute_instance.platform,
+│   on main.tf line 15, in resource "yandex_compute_instance" "platform":
+│   15: resource "yandex_compute_instance" "platform" {
+```
+5. Ответьте, как в процессе обучения могут пригодиться параметры```preemptible = true``` и ```core_fraction=5``` в параметрах ВМ? Ответ в документации Yandex cloud.
+
+В качестве решения приложите:
+- скриншот ЛК Yandex Cloud с созданной ВМ,
+- скриншот успешного подключения к консоли ВМ через ssh(к OS ubuntu необходимо подключаться под пользователем ubuntu: "ssh ubuntu@vm_ip_address"),
+- ответы на вопросы.
+
 ### Задание 2
 
 1. Изучите файлы проекта.
