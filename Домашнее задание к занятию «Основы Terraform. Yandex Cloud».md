@@ -232,6 +232,19 @@ nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
 2. Примените изменения.
 
 В качестве решения приложите вывод значений ip-адресов команды ```terraform output```
+**Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$ terraform output
+vm_platform_ip_address = [
+  "158.160.108.107",
+]
+vm_test_ip_address = [
+  "51.250.70.231",
+]
+nicolay@nicolay-VirtualBox:~/ter-homeworks/02/src$
+```
 
 
 ### Задание 5
