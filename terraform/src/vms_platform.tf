@@ -45,6 +45,7 @@ resource "yandex_vpc_subnet" "develop-1" {
 resource "yandex_compute_instance" "test" {
   name        = var.vm_db_name
   platform_id = var.vm_db_platform_id
+  for_each = local.metadata
   resources {
     cores         = var.vm_db_resources["cores"]
     memory        = var.vm_db_resources["memory"]
@@ -64,8 +65,8 @@ resource "yandex_compute_instance" "test" {
   }
 
   metadata = {
-    serial-port-enable = 1
-    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
+    serial-port-enable = each.value.serial-port-enable
+    ssh-keys           = each.value.ssh-keys
   }
 
 }

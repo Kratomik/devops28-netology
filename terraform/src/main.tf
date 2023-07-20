@@ -14,6 +14,7 @@ data "yandex_compute_image" "ubuntu" {
 }
 
 resource "yandex_compute_instance" "platform" {
+  for_each = local.metadata
   name        = var.vm_web_name
   platform_id = var.vm_web_platform_id
   resources {
@@ -35,8 +36,8 @@ resource "yandex_compute_instance" "platform" {
   }
 
   metadata = {
-    serial-port-enable = local.metadata{"serial-port-enable"}
-    ssh-keys           = local.metadata["ssh-keys"]
+    serial-port-enable = "${each.value.serial-port-enable}"
+    ssh-keys           = "${each.value.ssh-keys}"
   }
 
 }
