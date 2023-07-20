@@ -35,8 +35,8 @@ resource "yandex_compute_instance" "platform" {
   }
 
   metadata = {
-    serial-port-enable = 1
-    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
+    serial-port-enable = local.metadata["serial-port-enable"]
+    ssh-keys           = local.metadata["ssh-keys"]
   }
 
 }

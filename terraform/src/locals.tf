@@ -7,10 +7,11 @@ locals {
   metadata = {  for item in var.metadata : item.serial-port-enable => item }
 }
 
-output {
-  
+/*
+output "metadata" {
+  value = local.metadata
 }
 
-/*
+
 resource_map_key = { for item in var.cpu-ram-disk : item.vm_name => item }
 */
