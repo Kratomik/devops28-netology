@@ -4,7 +4,7 @@ locals {
 }
 
 locals {
-  metadata = {  for item in var.metadata : item.serial-port-enable => item }
+  metadata = {for item in var.metadata: item.serial-port-enable => item}
 }
 
 /*
