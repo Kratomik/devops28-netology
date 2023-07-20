@@ -43,7 +43,7 @@ resource "yandex_vpc_subnet" "develop-1" {
 }
 */
 resource "yandex_compute_instance" "test" {
-  name        = var.vm_db_name
+  name        = local.test
   platform_id = var.vm_db_platform_id
   for_each = local.metadata
   resources {
@@ -65,8 +65,8 @@ resource "yandex_compute_instance" "test" {
   }
 
   metadata = {
-    serial-port-enable = each.value.serial-port-enable
-    ssh-keys           = each.value.ssh-keys
+    serial-port-enable = "${each.value.serial-port-enable}"
+    ssh-keys           = "${each.value.ssh-keys}"
   }
 
 }

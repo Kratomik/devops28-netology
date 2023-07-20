@@ -1,11 +1,20 @@
-locals {
- platform = "${var.vm_web_name}"
- test = "${var.vm_db_name}"
-}
 
 locals {
-  metadata = {for item in var.metadata: item.serial-port-enable => item}
+ platform = "netology-${var.env}-${var.project}-${var.role}"
+ test     = "tetsing-${var.project}-${var.role}"
 }
+
+/*
+locals {
+  metadata = {for key, item in var.metadata: "${item.name}" => item}
+}
+*/
+
+locals {
+  metadata = {  for key, value in var.metadata : key => value }
+}
+
+
 
 /*
 output "metadata" {

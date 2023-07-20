@@ -90,10 +90,27 @@ variable "vm_db_resources" {
 
 variable "metadata" {
   type = list(object({
+  name               = string,
   serial-port-enable = number,
   ssh-keys           = string
   }))
 }
+
+variable "env" {
+  type        = string
+  default     = "develop"
+}
+
+variable "project" {
+  type        = string
+  default     = "analitics"
+}
+
+variable "role" {
+  type        = string
+  default     = "airflow"
+}
+
 
 ###ssh vars
 

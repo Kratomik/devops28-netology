@@ -15,7 +15,7 @@ data "yandex_compute_image" "ubuntu" {
 
 resource "yandex_compute_instance" "platform" {
   for_each = local.metadata
-  name        = var.vm_web_name
+  name        = local.platform
   platform_id = var.vm_web_platform_id
   resources {
     cores         = var.vm_web_resources["cores"]
