@@ -1,3 +1,4 @@
+
 resource "yandex_compute_instance" "web" {
   for_each = local.resource_map_key
   name     = each.value.vm_name
@@ -22,7 +23,7 @@ resource "yandex_compute_instance" "web" {
 
   metadata = {
     serial-port-enable = 1
-    ssh-keys           = "ubuntu:${local.file}"
+    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
   }
   depends_on = [yandex_compute_instance.vm]
 }

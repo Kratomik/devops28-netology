@@ -1,3 +1,4 @@
+
 resource "yandex_vpc_network" "develop" {
   name = var.vpc_name
 }
@@ -11,6 +12,7 @@ resource "yandex_vpc_subnet" "develop" {
 data "yandex_compute_image" "ubuntu" {
   family = "ubuntu-2004-lts"
 }
+
 resource "yandex_compute_instance" "platform" {
   name        = "netology-develop-platform-web"
   platform_id = "standard-v1"
@@ -24,6 +26,7 @@ resource "yandex_compute_instance" "platform" {
       image_id = data.yandex_compute_image.ubuntu.image_id
     }
   }
+
   scheduling_policy { preemptible = true }
 
   network_interface {
@@ -33,43 +36,7 @@ resource "yandex_compute_instance" "platform" {
   allow_stopping_for_update = true
 
   metadata = {
-    serial-port-enable = 1
     ssh-keys           = "ubuntu:${local.file}"
   }
 }
-resource "local_file" "hosts_cfg" {
-  content = templatefile("${path.module}/hosts.tftpl",
 
-    { webservers =  yandex_compute_instance.web    } )
-
-  filename = "${abspath(path.module)}/hosts.cfg"
-}
-
-
-resource "null_resource" "web_hosts_provision" {
-#Ждем создания инстанса
-depends_on = [yandex_compute_instance.web]
-
-#Добавление ПРИВАТНОГО ssh ключа в ssh-agent
-  provisioner "local-exec" {
-    command = "cat /home/nicolay/.ssh/id_ed25519 | ssh-add -"
-  }
-
-#Костыль!!! Даем ВМ время на первый запуск. Лучше выполнить это через wait_for port 22 на стороне ansible
- provisioner "local-exec" {
-    command = "sleep 30"
-  }
-
-#Запуск ansible-playbook
-  provisioner "local-exec" {
-    command  = "export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i ${abspath(path.module)}/hosts.cfg ${abspath(path.module)}/test.yml"
-    on_failure = continue #Продолжить выполнение terraform pipeline в случае ошибок
-    environment = { ANSIBLE_HOST_KEY_CHECKING = "False" }
-    #срабатывание триггера при изменении переменных
-  }
-    triggers = {
-      always_run         = "${timestamp()}" #всегда т.к. дата и время постоянно изменяются
-      playbook_src_hash  = file("${abspath(path.module)}/test.yml") # при изменении содержимого playbook файла
-      ssh_public_key     = var.public_key # при изменении переменной
-    }
-}

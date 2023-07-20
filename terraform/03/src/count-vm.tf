@@ -1,3 +1,4 @@
+
 resource "yandex_compute_instance" "vm" {
   count = 2
   name = "netology-develop-platform-web-${count.index+1}"
@@ -22,7 +23,7 @@ resource "yandex_compute_instance" "vm" {
 
   metadata = {
     serial-port-enable = 1
-    ssh-keys           = "ubuntu:${local.file}"
+    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
   }
 
 }

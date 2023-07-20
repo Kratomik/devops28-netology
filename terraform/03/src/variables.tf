@@ -41,6 +41,17 @@ variable "cpu-ram-disk" {
   }))
 }
 
+
+
+variable "disk_vm" {
+  type = list(object({
+  vm_name = string,
+  cores   = number,
+  memory  = number,
+  size    = number
+  }))
+}
+
 /*
 variable "volume" {
   description = "Disk_id vm"
@@ -56,10 +67,10 @@ variable "public_key" {
   default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
 }
 ###ssh vars
-/*
+
 variable "vms_ssh_root_key" {
   type        = string
   default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
   description = "ssh-keygen -t ed25519"
 }
-*/
+
