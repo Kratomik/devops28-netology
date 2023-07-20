@@ -36,15 +36,15 @@ data "yandex_compute_image" "ubuntu-2004-lts" {
 
 #создаем 2 идентичные ВМ
 resource "yandex_compute_instance" "example" {
-  name        = "netology-develop-platform-web-${count.index}"
+  name        = "netology-develop-platform-web-${count.index+1}"
   platform_id = "standard-v1"
   
-  count = 2
+  count = 5
 
   resources {
     cores  = 2
     memory = 1
-    core_fraction = 20
+    core_fraction = 5
   }
 
   boot_disk {
@@ -72,7 +72,7 @@ resource "yandex_compute_instance" "example" {
 resource "local_file" "hosts_cfg" {
   content = templatefile("${path.module}/hosts.tftpl",
 
-    { webservers =  yandex_compute_instance.example    }  )
+    { webservers =  yandex_compute_instance.example    } )
 
   filename = "${abspath(path.module)}/hosts.cfg"
 }
@@ -84,7 +84,7 @@ depends_on = [yandex_compute_instance.example]
 
 #Добавление ПРИВАТНОГО ssh ключа в ssh-agent
   provisioner "local-exec" {
-    command = "cat ~/.ssh/id_rsa | ssh-add -"
+    command = "cat /home/nicolay/.ssh/id_ed25519 | ssh-add -"
   }
 
 #Костыль!!! Даем ВМ время на первый запуск. Лучше выполнить это через wait_for port 22 на стороне ansible

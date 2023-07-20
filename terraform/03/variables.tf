@@ -31,35 +31,7 @@ variable "vpc_name" {
   description = "VPC network&subnet name"
 }
 
-variable "cpu-ram-disk" {
-  description = "Ресурсы виртуальных машин"
-  type = list(object({
-    vm_name = string,
-    cores  = number,
-    memory  = number,
-    size = number
-  }))
-}
-
-/*
-variable "volume" {
-  description = "Disk_id vm"
-  type = list(object({
-    disk_id = string
-  }))
-}
-*/
-
 variable "public_key" {
-  description = "Публичный ключ"
-  type        = string
-  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
+  type    = string
+  default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
 }
-###ssh vars
-/*
-variable "vms_ssh_root_key" {
-  type        = string
-  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
-  description = "ssh-keygen -t ed25519"
-}
-*/
