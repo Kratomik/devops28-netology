@@ -87,15 +87,14 @@ variable "vm_db_resources" {
     core_fraction = 20    
   }
 }
-/*
+
 variable "metadata" {
-  type        = map
-  default     = {
-    serial-port-enable = 1
-    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
-  } 
+  type = list(object({
+  serial-port-enable = number,
+  ssh-keys           = string
+  }))
 }
-*/
+
 ###ssh vars
 
 variable "vms_ssh_root_key" {
