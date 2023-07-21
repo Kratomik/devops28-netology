@@ -34,6 +34,8 @@
 2. Модуль должен возвращать значения vpc.id и subnet.id
 3. Замените ресурсы yandex_vpc_network и yandex_vpc_subnet, созданным модулем.
 4. Сгенерируйте документацию к модулю с помощью terraform-docs.    
+- **Ответ:**
+Сгенерированную документацию положил в файл readme.md
  
 Пример вызова:
 ```
@@ -47,11 +49,302 @@ module "vpc_dev" {
 
 ### Задание 3
 1. Выведите список ресурсов в стейте.
+- **Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform show
+# data.template_file.cloudinit:
+data "template_file" "cloudinit" {
+    id       = "fbdfbc67f1f3d578525b5c4244cff9cc5b3cbd8b8d2bcf58a4e5c1ea68f183ad"
+    rendered = <<-EOT
+        #cloud-config
+        users:
+          - name: ubuntu
+            groups: sudo
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh_authorized_keys:
+              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox
+
+        package_update: true
+        package_upgrade: false
+        packages:
+         - vim
+         - nginx
+    EOT
+    template = <<-EOT
+        #cloud-config
+        users:
+          - name: ubuntu
+            groups: sudo
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh_authorized_keys:
+              - ${public_key}
+        package_update: true
+        package_upgrade: false
+        packages:
+         - vim
+         - nginx
+    EOT
+    vars     = {
+        "public_key" = <<-EOT
+            ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox
+        EOT
+    }
+}
+
+# module.test-vm.data.yandex_compute_image.my_image:
+data "yandex_compute_image" "my_image" {
+    created_at    = "2023-07-10T10:52:32Z"
+    description   = "ubuntu 20.04 lts"
+    family        = "ubuntu-2004-lts"
+    folder_id     = "standard-images"
+    id            = "fd85f37uh98ldl1omk30"
+    image_id      = "fd85f37uh98ldl1omk30"
+    labels        = {}
+    min_disk_size = 5
+    name          = "ubuntu-20-04-lts-v20230710"
+    os_type       = "linux"
+    pooled        = true
+    product_ids   = [
+        "f2ef6jide8f1cj8dcbun",
+    ]
+    size          = 4
+    status        = "ready"
+}
+
+# module.test-vm.yandex_compute_instance.vm[0]:
+resource "yandex_compute_instance" "vm" {
+    allow_stopping_for_update = true
+    created_at                = "2023-07-21T19:31:29Z"
+    description               = "TODO: description; {{terraform managed}}"
+    folder_id                 = "b1g65udbfo9s663p3amb"
+    fqdn                      = "develop-web-0.ru-central1.internal"
+    hostname                  = "develop-web-0"
+    id                        = "fhmkm8steodhgobbsh4o"
+    labels                    = {
+        "env"     = "develop"
+        "project" = "undefined"
+    }
+    metadata                  = {
+        "serial-port-enable" = "1"
+        "user-data"          = <<-EOT
+            #cloud-config
+            users:
+              - name: ubuntu
+                groups: sudo
+                shell: /bin/bash
+                sudo: ['ALL=(ALL) NOPASSWD:ALL']
+                ssh_authorized_keys:
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox
+
+            package_update: true
+            package_upgrade: false
+            packages:
+             - vim
+             - nginx
+        EOT
+    }
+    name                      = "develop-web-0"
+    network_acceleration_type = "standard"
+    platform_id               = "standard-v1"
+    status                    = "running"
+    zone                      = "ru-central1-a"
+
+    boot_disk {
+        auto_delete = true
+        device_name = "fhm7b4nc8fhkeabbv184"
+        disk_id     = "fhm7b4nc8fhkeabbv184"
+        mode        = "READ_WRITE"
+
+        initialize_params {
+            block_size = 4096
+            image_id   = "fd85f37uh98ldl1omk30"
+            size       = 10
+            type       = "network-hdd"
+        }
+    }
+
+    metadata_options {
+        aws_v1_http_endpoint = 1
+        aws_v1_http_token    = 2
+        gce_http_endpoint    = 1
+        gce_http_token       = 1
+    }
+
+    network_interface {
+        index              = 0
+        ip_address         = "10.0.5.14"
+        ipv4               = true
+        ipv6               = false
+        mac_address        = "d0:0d:14:b2:39:d7"
+        nat                = true
+        nat_ip_address     = "158.160.42.110"
+        nat_ip_version     = "IPV4"
+        security_group_ids = []
+        subnet_id          = "e9bbnbomi83alp016e7q"
+    }
+
+    placement_policy {
+        host_affinity_rules = []
+    }
+
+    resources {
+        core_fraction = 5
+        cores         = 2
+        gpus          = 0
+        memory        = 1
+    }
+
+    scheduling_policy {
+        preemptible = true
+    }
+}
+
+
+# module.vpc.yandex_vpc_network.test:
+resource "yandex_vpc_network" "test" {
+    created_at = "2023-07-21T19:31:25Z"
+    folder_id  = "b1g65udbfo9s663p3amb"
+    id         = "enphj5iqu6c5dvj9tq2m"
+    labels     = {}
+    name       = "vpc"
+    subnet_ids = []
+}
+
+# module.vpc.yandex_vpc_subnet.test:
+resource "yandex_vpc_subnet" "test" {
+    created_at     = "2023-07-21T19:31:26Z"
+    folder_id      = "b1g65udbfo9s663p3amb"
+    id             = "e9bbnbomi83alp016e7q"
+    labels         = {}
+    name           = "develop-ru-central1-a"
+    network_id     = "enphj5iqu6c5dvj9tq2m"
+    v4_cidr_blocks = [
+        "10.0.5.0/24",
+    ]
+    v6_cidr_blocks = []
+    zone           = "ru-central1-a"
+}
+
+Outputs:
+
+vpc = {
+    name = {
+        created_at     = "2023-07-21T19:31:26Z"
+        description    = ""
+        dhcp_options   = []
+        folder_id      = "b1g65udbfo9s663p3amb"
+        id             = "e9bbnbomi83alp016e7q"
+        labels         = {}
+        name           = "develop-ru-central1-a"
+        network_id     = "enphj5iqu6c5dvj9tq2m"
+        route_table_id = ""
+        v4_cidr_blocks = [
+            "10.0.5.0/24",
+        ]
+        v6_cidr_blocks = []
+        zone           = "ru-central1-a"
+    }
+}
+```
 2. Полностью удалите из стейта модуль vpc.
+- **Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform state rm "module.vpc"
+Removed module.vpc.yandex_vpc_network.test
+Removed module.vpc.yandex_vpc_subnet.test
+Successfully removed 2 resource instance(s).
+```
 3. Полностью удалите из стейта модуль vm.
+- **Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform state rm "module.test-vm"
+Removed module.test-vm.data.yandex_compute_image.my_image
+Removed module.test-vm.yandex_compute_instance.vm[0]
+Successfully removed 2 resource instance(s).
+```
 4. Импортируйте все обратно. Проверьте terraform plan - изменений быть не должно.
 Приложите список выполненных команд и скриншоты процессы.
+- **Ответ:**
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform import "module.vpc.yandex_vpc_network.test" enphj5iqu6c5dvj9tq2m
+╷
+│ Warning: Version constraints inside provider configuration blocks are deprecated
+│
+│   on .terraform/modules/test-vm/providers.tf line 2, in provider "template":
+│    2:   version = "2.2.0"
+│
+│ Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be
+│ removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.
+╵
 
+data.template_file.cloudinit: Reading...
+data.template_file.cloudinit: Read complete after 0s [id=fbdfbc67f1f3d578525b5c4244cff9cc5b3cbd8b8d2bcf58a4e5c1ea68f183ad]
+module.test-vm.data.yandex_compute_image.my_image: Reading...
+module.vpc.yandex_vpc_network.test: Importing from ID "enphj5iqu6c5dvj9tq2m"...
+module.vpc.yandex_vpc_network.test: Import prepared!
+  Prepared yandex_vpc_network for import
+module.vpc.yandex_vpc_network.test: Refreshing state... [id=enphj5iqu6c5dvj9tq2m]
+module.test-vm.data.yandex_compute_image.my_image: Read complete after 1s [id=fd85f37uh98ldl1omk30]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform import "module.vpc.yandex_vpc_subnet.test" e9bbnbomi83alp016e7q
+╷
+│ Warning: Version constraints inside provider configuration blocks are deprecated
+│
+│   on .terraform/modules/test-vm/providers.tf line 2, in provider "template":
+│    2:   version = "2.2.0"
+│
+│ Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be
+│ removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.
+╵
+
+data.template_file.cloudinit: Reading...
+data.template_file.cloudinit: Read complete after 0s [id=fbdfbc67f1f3d578525b5c4244cff9cc5b3cbd8b8d2bcf58a4e5c1ea68f183ad]
+module.test-vm.data.yandex_compute_image.my_image: Reading...
+module.vpc.yandex_vpc_subnet.test: Importing from ID "e9bbnbomi83alp016e7q"...
+module.vpc.yandex_vpc_subnet.test: Import prepared!
+  Prepared yandex_vpc_subnet for import
+module.vpc.yandex_vpc_subnet.test: Refreshing state... [id=e9bbnbomi83alp016e7q]
+module.test-vm.data.yandex_compute_image.my_image: Read complete after 1s [id=fd85f37uh98ldl1omk30]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform import "module.test-vm.yandex_compute_instance.vm[0]" fhmkm8steodhgobbsh4o
+╷
+│ Warning: Version constraints inside provider configuration blocks are deprecated
+│
+│   on .terraform/modules/test-vm/providers.tf line 2, in provider "template":
+│    2:   version = "2.2.0"
+│
+│ Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be
+│ removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.
+╵
+
+module.test-vm.data.yandex_compute_image.my_image: Reading...
+data.template_file.cloudinit: Reading...
+data.template_file.cloudinit: Read complete after 0s [id=fbdfbc67f1f3d578525b5c4244cff9cc5b3cbd8b8d2bcf58a4e5c1ea68f183ad]
+module.test-vm.data.yandex_compute_image.my_image: Read complete after 1s [id=fd85f37uh98ldl1omk30]
+module.test-vm.yandex_compute_instance.vm[0]: Importing from ID "fhmkm8steodhgobbsh4o"...
+module.test-vm.yandex_compute_instance.vm[0]: Import prepared!
+  Prepared yandex_compute_instance for import
+module.test-vm.yandex_compute_instance.vm[0]: Refreshing state... [id=fhmkm8steodhgobbsh4o]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+```
 ## Дополнительные задания (со звездочкой*)
 
 **Настоятельно рекомендуем выполнять все задания под звёздочкой.**   Их выполнение поможет глубже разобраться в материале.   
