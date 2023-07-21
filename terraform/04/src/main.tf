@@ -26,22 +26,30 @@ resource "yandex_vpc_subnet" "develop" {
 
 module "vpc" {
   source = "./modules/yc_network"
+
+  vpc_name  = "vpc"
   token     = var.token
   cloud_id  = var.cloud_id
   folder_id = var.folder_id
 }
 
+
+output "vpc" {
+  value = module.vpc
+}
+
+
 module "test-vm" {
   source          = "git::https://github.com/udjin10/yandex_compute_instance.git?ref=main"
   env_name        = "develop"
-  network_id      = "yandex_vpc_network.test_id"
+  network_id      = module.vpc.name.network_id
   subnet_zones    = ["ru-central1-a"]
-  subnet_ids      = [ "yandex_vpc_subnet.test_id" ]
+  subnet_ids      = [ module.vpc.name.id ]
   instance_name   = "web"
   instance_count  = 1
   image_family    = "ubuntu-2004-lts"
   public_ip       = true
-
+  
   metadata = {
       user-data          = data.template_file.cloudinit.rendered #Для демонстрации №3
       serial-port-enable = 1
