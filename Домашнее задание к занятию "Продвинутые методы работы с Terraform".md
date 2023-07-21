@@ -24,7 +24,7 @@
 3. Добавьте в файл cloud-init.yml установку nginx.
 4. Предоставьте скриншот подключения к консоли и вывод команды ```sudo nginx -t```.
 -**Ответ:**
-![img.png](screen/screen-11.png)
+![img.png](screen/screen-14.png)
 
 ------
 
