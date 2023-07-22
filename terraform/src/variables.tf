@@ -87,7 +87,7 @@ variable "vm_db_resources" {
     core_fraction = 20    
   }
 }
-
+/*
 variable "metadata" {
   type = list(object({
   name               = string,
@@ -96,6 +96,7 @@ variable "metadata" {
   }))
 }
 
+*/
 variable "env" {
   type        = string
   default     = "develop"
@@ -110,6 +111,18 @@ variable "role" {
   type        = string
   default     = "airflow"
 }
+
+variable "metadata" {
+  type = map(any)
+  default = {
+    "ssh-keys"           = "ubuntu:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
+    "serial-port-enable" = 1
+  }
+}
+
+
+
+
 
 
 ###ssh vars

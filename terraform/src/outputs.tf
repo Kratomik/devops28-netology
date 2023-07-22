@@ -9,3 +9,4 @@ output "vm_test_ip_address" {
   description = "vm_test external ip"
 }
 */
+
