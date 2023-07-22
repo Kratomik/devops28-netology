@@ -259,10 +259,9 @@ Successfully removed 2 resource instance(s).
 3. Полностью удалите из стейта модуль vm.
 - **Ответ:**
 ```Bash
-nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform state rm "module.test-vm"
-Removed module.test-vm.data.yandex_compute_image.my_image
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform state rm "module.test-vm.yandex_compute_instance.vm[0]"
 Removed module.test-vm.yandex_compute_instance.vm[0]
-Successfully removed 2 resource instance(s).
+Successfully removed 1 resource instance(s).
 ```
 4. Импортируйте все обратно. Проверьте terraform plan - изменений быть не должно.
 Приложите список выполненных команд и скриншоты процессы.
@@ -345,6 +344,31 @@ Import successful!
 The resources that were imported are shown above. These resources are now in
 your Terraform state and will henceforth be managed by Terraform.
 ```
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$ terraform plan
+data.template_file.cloudinit: Reading...
+data.template_file.cloudinit: Read complete after 0s [id=fbdfbc67f1f3d578525b5c4244cff9cc5b3cbd8b8d2bcf58a4e5c1ea68f183ad]
+module.test-vm.data.yandex_compute_image.my_image: Reading...
+module.vpc.yandex_vpc_network.test: Refreshing state... [id=enprleffkr3uag7e0hhf]
+module.test-vm.data.yandex_compute_image.my_image: Read complete after 1s [id=fd85f37uh98ldl1omk30]
+module.vpc.yandex_vpc_subnet.test: Refreshing state... [id=e9b7u0p9v9tlnuoi4lg6]
+module.test-vm.yandex_compute_instance.vm[0]: Refreshing state... [id=fhmpkaiv1vsrk1lhh782]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.
+╷
+│ Warning: Version constraints inside provider configuration blocks are deprecated
+│
+│   on .terraform/modules/test-vm/providers.tf line 2, in provider "template":
+│    2:   version = "2.2.0"
+│
+│ Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be
+│ removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.
+╵
+nicolay@nicolay-VirtualBox:~/devops28-netology/terraform/04/src$
+```
+
 ## Дополнительные задания (со звездочкой*)
 
 **Настоятельно рекомендуем выполнять все задания под звёздочкой.**   Их выполнение поможет глубже разобраться в материале.   
