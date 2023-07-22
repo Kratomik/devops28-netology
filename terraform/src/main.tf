@@ -14,13 +14,12 @@ data "yandex_compute_image" "ubuntu" {
 }
 
 resource "yandex_compute_instance" "platform" {
-  for_each = local.metadata
-  name        = local.platform
-  platform_id = var.vm_web_platform_id
+  name        = var.vms_resources.vm1["name"]
+  platform_id = var.vms_resources.vm1["platform_id"]
   resources {
-    cores         = var.vm_web_resources["cores"]
-    memory        = var.vm_web_resources["memory"]
-    core_fraction = var.vm_web_resources["core_fraction"]
+    cores         = var.vms_resources.vm1["cores"]
+    memory        = var.vms_resources.vm1["memory"]
+    core_fraction = var.vms_resources.vm1["core_fraction"]
   }
   boot_disk {
     initialize_params {
@@ -36,8 +35,8 @@ resource "yandex_compute_instance" "platform" {
   }
 
   metadata = {
-    serial-port-enable = var.metadata.serial-port-enable
-    ssh-keys           = var.metadata.ssh-keys
+    serial-port-enable = var.vms_resources.vm1["serial-port-enable"]
+    ssh-keys           = var.vms_resources.vm1["ssh-keys"]
   }
 
 

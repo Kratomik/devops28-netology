@@ -37,6 +37,7 @@ variable "vm_web_family" {
   description = "install OC"
 }
 
+/*
 variable "vm_web_name" {
   type        = string
   default     = "netology-develop-platform-web"
@@ -87,7 +88,7 @@ variable "vm_db_resources" {
     core_fraction = 20    
   }
 }
-/*
+
 variable "metadata" {
   type = list(object({
   name               = string,
@@ -112,6 +113,7 @@ variable "role" {
   default     = "airflow"
 }
 
+/*
 variable "metadata" {
   type = map(any)
   default = {
@@ -119,9 +121,20 @@ variable "metadata" {
     "serial-port-enable" = 1
   }
 }
-
-
-
+*/
+variable "vms_resources" {
+  description = "Configi VM"
+  type        = map(object({
+    name               = string
+    cores              = number
+    memory             = number
+    size               = number
+    core_fraction      = number
+    platform_id        = string
+    ssh-keys           = string
+    serial-port-enable = number
+  }))    
+}
 
 
 

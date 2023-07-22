@@ -43,13 +43,12 @@ resource "yandex_vpc_subnet" "develop-1" {
 }
 */
 resource "yandex_compute_instance" "test" {
-  name        = local.test
-  platform_id = var.vm_db_platform_id
-  for_each = local.metadata
+  name        = var.vms_resources.vm2["name"]
+  platform_id = var.vms_resources.vm2["platform_id"]
   resources {
-    cores         = var.vm_db_resources["cores"]
-    memory        = var.vm_db_resources["memory"]
-    core_fraction = var.vm_db_resources["core_fraction"]
+    cores         = var.vms_resources.vm2["cores"]
+    memory        = var.vms_resources.vm2["memory"]
+    core_fraction = var.vms_resources.vm2["core_fraction"]
   }
   boot_disk {
     initialize_params {
@@ -65,19 +64,19 @@ resource "yandex_compute_instance" "test" {
   }
 
   metadata = {
-    serial-port-enable = var.metadata.serial-port-enable
-    ssh-keys           = var.metadata.ssh-keys
+    serial-port-enable = var.vms_resources.vm2["serial-port-enable"]
+    ssh-keys           = var.vms_resources.vm2["ssh-keys"]
   }
 
 }
 
-
+/*
 variable "vm_db_name" {
   type        = string
   default     = "netology-develop-platform-db"
   description = "Name web-platforms"
 }
-
+*/
 variable "vm_db_platform_id" {
   type        = string
   default     = "standard-v1"
