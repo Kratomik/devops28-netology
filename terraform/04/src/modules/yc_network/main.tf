@@ -5,14 +5,13 @@ resource "yandex_vpc_network" "test" {
 
 #создаем подсеть
 resource "yandex_vpc_subnet" "test" {
-  name           = "develop-ru-central1-a"
-  zone           = "ru-central1-a"
+  name           = var.vpc_name
   network_id     = yandex_vpc_network.test.id
-  v4_cidr_blocks = ["10.0.5.0/24"]
+  zone           = var.default_zone
+  v4_cidr_blocks = var.default_cidr
 }
 
 
 output "name" {
   value = yandex_vpc_subnet.test
 }
-

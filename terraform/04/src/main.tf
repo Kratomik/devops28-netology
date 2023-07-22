@@ -26,8 +26,6 @@ resource "yandex_vpc_subnet" "develop" {
 
 module "vpc" {
   source = "./modules/yc_network"
-
-  vpc_name  = "vpc"
   token     = var.token
   cloud_id  = var.cloud_id
   folder_id = var.folder_id

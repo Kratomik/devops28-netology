@@ -28,8 +28,9 @@ variable "default_cidr" {
 variable "vpc_name" {
   type        = string
   default     = "develop"
-  description = "VPC network&subnet name"
+  description = "VPC network name"
 }
+
 
 ###common vars
 
