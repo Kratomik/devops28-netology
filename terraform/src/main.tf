@@ -34,10 +34,7 @@ resource "yandex_compute_instance" "platform" {
     nat       = true
   }
 
-  metadata = {
-    serial-port-enable = var.vms_resources.vm1["serial-port-enable"]
-    ssh-keys           = var.vms_resources.vm1["ssh-keys"]
-  }
+  metadata = var.metadata
 
 
 }

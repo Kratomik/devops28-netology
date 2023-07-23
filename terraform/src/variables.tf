@@ -89,15 +89,8 @@ variable "vm_db_resources" {
   }
 }
 
-variable "metadata" {
-  type = list(object({
-  name               = string,
-  serial-port-enable = number,
-  ssh-keys           = string
-  }))
-}
-
 */
+
 variable "env" {
   type        = string
   default     = "develop"
@@ -113,7 +106,7 @@ variable "role" {
   default     = "airflow"
 }
 
-/*
+
 variable "metadata" {
   type = map(any)
   default = {
@@ -121,7 +114,7 @@ variable "metadata" {
     "serial-port-enable" = 1
   }
 }
-*/
+
 variable "vms_resources" {
   description = "Configi VM"
   type        = map(object({

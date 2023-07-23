@@ -63,10 +63,7 @@ resource "yandex_compute_instance" "test" {
     nat       = true
   }
 
-  metadata = {
-    serial-port-enable = var.vms_resources.vm2["serial-port-enable"]
-    ssh-keys           = var.vms_resources.vm2["ssh-keys"]
-  }
+  metadata = var.metadata
 
 }
 
@@ -76,7 +73,7 @@ variable "vm_db_name" {
   default     = "netology-develop-platform-db"
   description = "Name web-platforms"
 }
-*/
+
 variable "vm_db_platform_id" {
   type        = string
   default     = "standard-v1"
@@ -100,3 +97,4 @@ variable "vm_db_core_fraction" {
   default     = "20"
   description = "Доля загрузки каждого ядра в %"
 }
+*/
