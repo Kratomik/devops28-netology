@@ -141,7 +141,68 @@ nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbo
 ```
 
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ cat ./group_vars/deb/examp.yml
+---
+  some_fact: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64656334343539623331636638623066316334376235373236313639353737363339393964633030
+          3731633730656530316431313831393637646239303936620a663931366538303732326230666164
+          61336566383565616433396132656237626234303166316135626663306637386365353761636536
+          3837353864653263610a653765616234376233336131386364306537363537363134333732313965
+          38363935313831346166326661353562383739656432356136633966343936336564
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ cat ./group_vars/el/examp.yml
+---
+  some_fact: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66633236386230333338663336636138663265383233363539366131376632633065316333643232
+          6138353932633262613234306332616239373431396336330a643838323062363536653236323739
+          37623930626564396539366536326563373864333539346137366266383062643538366662643264
+          3865386635366237610a656534633666636661336364383061616239663138613330323166393939
+          6365
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
+```
+
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ ansible-playbook ./site.yml -i inventory/prod.yml --ask-vault-pass
+Vault password:
+
+PLAY [Print os facts] *******************************************************************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************************************************
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] *************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] ***********************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP ******************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
+```
+
+
 9. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
 10. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
 11. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь, что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
