@@ -64,6 +64,16 @@ nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbo
 3. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
 - Ответ:
 ```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology$ docker ps -a
+CONTAINER ID   IMAGE                      COMMAND       CREATED         STATUS         PORTS     NAMES
+13faf33f7fed   pycontribs/ubuntu:latest   "/bin/bash"   6 minutes ago   Up 6 minutes             ubuntu
+953818af6ed3   pycontribs/centos:7        "/bin/bash"   8 minutes ago   Up 8 minutes             centos7
+nicolay@nicolay-VirtualBox:~/devops28-netology$
+```
+
+4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
+- Ответ:
+```Bash
 nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ ansible-playbook ./site.yml -i inventory/prod.yml
 
 PLAY [Print os facts] *******************************************************************************************************************************
@@ -95,7 +105,6 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
 ```
 
-4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
 5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились значения: для `deb` — `deb default fact`, для `el` — `el default fact`.
 6.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
