@@ -204,8 +204,75 @@ nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbo
 
 
 9. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
+- Ответ:
+```Bash
+local                          execute on controller
+```
 10. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ cat ./inventory/prod.yml
+---
+  el:
+    hosts:
+      centos7:
+        ansible_connection: docker
+  deb:
+    hosts:
+      ubuntu:
+        ansible_connection: docker
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
+```
+
+
 11. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь, что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$ ansible-playbook ./site.yml -i inventory/prod.yml --ask-vault-pass
+Vault password:
+
+PLAY [Print os facts] *******************************************************************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] *************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] ***********************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [localhost] => {
+    "msg": "all default fact"
+}
+
+PLAY RECAP ******************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+nicolay@nicolay-VirtualBox:~/devops28-netology/ansible/08-ansible-01-base/playbook$
+```
+
+
 12. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
 
 ## Необязательная часть
