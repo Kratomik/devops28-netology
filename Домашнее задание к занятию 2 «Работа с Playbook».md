@@ -10,7 +10,22 @@
 ## Основная часть
 
 1. Подготовьте свой inventory-файл `prod.yml`.
+- Ответ:
+```Bash
+clickhouse:
+  hosts:
+      clickhouse:
+            ansible_connection: docker
+            
+vector:
+  hosts:
+      vector:
+            ansible_connection: docker
+[mag@node-centos7 inventory]$
+```
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev). Конфигурация vector должна деплоиться через template файл jinja2.
+3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
+4. Tasks должны: скачать дистрибутив нужной версии, выполнить распаковку в выбранную директорию, установить vector.
 - Ответ:
 ```Bash
 [mag@node-centos7 playbook]$ ansible-playbook -i inventory/prod.yml site.yml -kK
@@ -62,10 +77,6 @@ vector                     : ok=5    changed=0    unreachable=0    failed=0    s
 
 [mag@node-centos7 playbook]$
 ```
-
-
-3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
-4. Tasks должны: скачать дистрибутив нужной версии, выполнить распаковку в выбранную директорию, установить vector.
 5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
 7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
