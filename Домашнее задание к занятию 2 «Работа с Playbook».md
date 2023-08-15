@@ -39,6 +39,65 @@ TASK [Gathering Facts] *********************************************************
 ok: [clickhouse]
 
 TASK [Clickhouse | Get clickhouse distrib] ************************************************************************************************************************************************************************
+changed: [clickhouse] => (item=clickhouse-client)
+changed: [clickhouse] => (item=clickhouse-server)
+failed: [clickhouse] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 0, "item": "clickhouse-common-static", "msg": "Request failed", "response": "HTTP Error 404: Not Found", "status_code": 404, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.noarch.rpm"}
+
+TASK [Clickhouse | Get clickhouse distrib] ************************************************************************************************************************************************************************
+changed: [clickhouse]
+
+TASK [Install clickhouse packages] ********************************************************************************************************************************************************************************
+changed: [clickhouse]
+
+RUNNING HANDLER [Start clickhouse service] ************************************************************************************************************************************************************************
+changed: [clickhouse]
+
+TASK [Create database] ********************************************************************************************************************************************************************************************
+changed: [clickhouse]
+
+PLAY [Install Vector] *********************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [vector]
+
+TASK [Vector | Download packages] *********************************************************************************************************************************************************************************
+changed: [vector]
+
+TASK [Vector | Install packages] **********************************************************************************************************************************************************************************
+changed: [vector]
+
+TASK [Vector | Apply template] ************************************************************************************************************************************************************************************
+[WARNING]: The value 0 (type int) in a string field was converted to u'0' (type string). If this does not look like what you expect, quote the entire value to ensure it does not change.
+changed: [vector]
+
+TASK [Vector | change systemd unit] *******************************************************************************************************************************************************************************
+changed: [vector]
+
+RUNNING HANDLER [Start Vector service] ****************************************************************************************************************************************************************************
+fatal: [vector]: FAILED! => {"changed": false, "msg": "Could not find the requested service vector: "}
+
+NO MORE HOSTS LEFT ************************************************************************************************************************************************************************************************
+
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+clickhouse                 : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=1    ignored=0
+vector                     : ok=5    changed=4    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+
+[mag@node-centos7 playbook]$
+```
+
+```Bash
+[mag@node-centos7 playbook]$ ansible-playbook -i inventory/prod.yml site.yml -kK
+SSH password:
+BECOME password[defaults to SSH password]:
+[WARNING]: Found both group and host with same name: vector
+[WARNING]: Found both group and host with same name: clickhouse
+
+PLAY [Install Clickhouse] *****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [clickhouse]
+
+TASK [Clickhouse | Get clickhouse distrib] ************************************************************************************************************************************************************************
 ok: [clickhouse] => (item=clickhouse-client)
 ok: [clickhouse] => (item=clickhouse-server)
 failed: [clickhouse] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 0, "gid": 0, "group": "root", "item": "clickhouse-common-static", "mode": "0644", "msg": "Request failed", "owner": "root", "response": "HTTP Error 404: Not Found", "size": 246310036, "state": "file", "status_code": 404, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.noarch.rpm"}
