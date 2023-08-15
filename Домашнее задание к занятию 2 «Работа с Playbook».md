@@ -145,10 +145,53 @@ vector                     : ok=5    changed=0    unreachable=0    failed=0    s
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
 - Ответ:
 ```Bash
-[mag@node-centos7 playbook]$ ansible-lint ./site.yml -i inventory/prod.yml --check
-Usage: ansible-lint [options] playbook.yml [playbook2 ...]
+[mag@node-centos7 playbook]$ ansible-playbook -i inventory/prod.yml site.yml --check -kK
+SSH password:
+BECOME password[defaults to SSH password]:
+[WARNING]: Found both group and host with same name: vector
+[WARNING]: Found both group and host with same name: clickhouse
 
-ansible-lint: error: no such option: -i
+PLAY [Install Clickhouse] *****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [clickhouse]
+
+TASK [Clickhouse | Get clickhouse distrib] ************************************************************************************************************************************************************************
+ok: [clickhouse] => (item=clickhouse-client)
+ok: [clickhouse] => (item=clickhouse-server)
+failed: [clickhouse] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 1, "gid": 0, "group": "root", "item": "clickhouse-common-static", "mode": "0644", "msg": "Request failed", "owner": "root", "response": "HTTP Error 404: Not Found", "size": 246310036, "state": "file", "status_code": 404, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.noarch.rpm"}
+
+TASK [Clickhouse | Get clickhouse distrib] ************************************************************************************************************************************************************************
+ok: [clickhouse]
+
+TASK [Install clickhouse packages] ********************************************************************************************************************************************************************************
+ok: [clickhouse]
+
+TASK [Create database] ********************************************************************************************************************************************************************************************
+skipping: [clickhouse]
+
+PLAY [Install Vector] *********************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [vector]
+
+TASK [Vector | Download packages] *********************************************************************************************************************************************************************************
+ok: [vector]
+
+TASK [Vector | Install packages] **********************************************************************************************************************************************************************************
+ok: [vector]
+
+TASK [Vector | Apply template] ************************************************************************************************************************************************************************************
+[WARNING]: The value 0 (type int) in a string field was converted to u'0' (type string). If this does not look like what you expect, quote the entire value to ensure it does not change.
+ok: [vector]
+
+TASK [Vector | change systemd unit] *******************************************************************************************************************************************************************************
+ok: [vector]
+
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+clickhouse                 : ok=3    changed=0    unreachable=0    failed=0    skipped=1    rescued=1    ignored=0
+vector                     : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
 [mag@node-centos7 playbook]$
 ```
 7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
