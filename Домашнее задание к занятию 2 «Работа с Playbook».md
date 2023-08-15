@@ -21,7 +21,6 @@ vector:
   hosts:
       vector:
             ansible_connection: docker
-[mag@node-centos7 inventory]$
 ```
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает [vector](https://vector.dev). Конфигурация vector должна деплоиться через template файл jinja2.
 3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
