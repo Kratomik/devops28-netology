@@ -1,11 +1,16 @@
 ---
 clickhouse:
   hosts:
-    clickhouse:
-      ansible_connection: docker
+    clickhouse-01:
+      ansible_host:
 
 
 vector:
   hosts:
-    vector:
-      ansible_connection: docker
+    vector-01:
+      ansible_host:
+
+lighthouse:
+  hosts:
+    lighthouse-01:
+      ansible_host:
