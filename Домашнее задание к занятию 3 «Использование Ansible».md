@@ -131,38 +131,6 @@
 ```
 2. При создании tasks рекомендую использовать модули: `get_url`, `template`, `yum`, `apt`.
 - Ответ: Используемые модули отображены в ответе на первый вопрос.
-```Bash
-[mag@clickhouse-01 ~]$ clickhouse-client -h 127.0.0.1
-ClickHouse client version 22.3.3.44 (official build).
-Connecting to 127.0.0.1:9000 as user default.
-Connected to ClickHouse server version 22.3.3 revision 54455.
-
-clickhouse-01.ru-central1.internal :)
-```
-```Bash
-[mag@vector-01 ~]$ cd /etc/vector/
-[mag@vector-01 vector]$
-[mag@vector-01 vector]$ ls
-examples  vector.toml  vector.yml
-[mag@vector-01 vector]$ cat vector.yml
-sinks:
-    to_clickhouse:
-        compression: gzip
-        database: logs
-        endpoint: http://192.168.12.193:8123
-        healthcheck: true
-        inputs:
-        - demo_logs
-        skip_unknown_fields: true
-        table: vector_table
-        type: clickhouse
-sources:
-    demo_logs:
-        format: syslog
-        type: demo_logs
-[mag@vector-01 vector]$
-
-```
 
 3. Tasks должны: скачать статику LightHouse, установить Nginx или любой другой веб-сервер, настроить его конфиг для открытия LightHouse, запустить веб-сервер.
 - Ответ: Перечисление действий tasks отображены в ответе на первый вопрос, вывод команды ниже.
