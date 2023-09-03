@@ -1,0 +1,25 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Example assertion
+    assert:
+      that: 
+        - true
+  - name: Execute vector
+    command: vector --version
+    changed_when: false
+    register: vector_version_rc
+  - name: Check vector config file 
+    lineinfile:
+      path: /etc/vector/vector.yml
+      line: '    pattern = "(?<capture>\\d+)%{GREEDYDATA}"'
+    diff: true
+    register: grok_pattern_rc
+  - name: Assert vector is installed
+    assert:
+      that:
+        - vector_version_rc is success
