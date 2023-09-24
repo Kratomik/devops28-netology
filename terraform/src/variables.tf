@@ -33,13 +33,13 @@ variable "vpc_name" {
 
 variable "vm_web_family" {
   type        = string
-  default     = "ubuntu-2004-lts"
+  default     = "centos-7"
   description = "install OC"
 }
 
 variable "vm_web_name" {
   type        = string
-  default     = "netology-develop-platform-web"
+  default     = "vm-1"
   description = "Name web-platforms"
 }
 
@@ -58,7 +58,7 @@ variable "vm_veb_cores" {
 
 variable "vm_veb_memory" {
   type        = number
-  default     = "1"
+  default     = "4"
   description = "Количество памяти"
 }
 
@@ -73,7 +73,7 @@ variable "vm_web_resources" {
   type        = map(string)
   default     = {
     cores      = "2"
-    memory     = "1"
+    memory     = "4"
     core_fraction = "5"
   }
 }
@@ -83,19 +83,11 @@ variable "vm_db_resources" {
   type        = map
   default     = {
     cores      = 2
-    memory     = 2
+    memory     = 4
     core_fraction = 20    
   }
 }
-/*
-variable "metadata" {
-  type        = map
-  default     = {
-    serial-port-enable = 1
-    ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
-  } 
-}
-*/
+
 ###ssh vars
 
 variable "vms_ssh_root_key" {
@@ -105,3 +97,16 @@ variable "vms_ssh_root_key" {
 }
 
 
+variable "ssh_public_key" {
+  type        = string
+  default     = "~/.ssh/id_ed25519.pub"
+  description = "ssh-keygen -t ed25519"
+}
+
+variable "metadata" {
+  type = map(any)
+  default = {
+    "ssh-keys"           = "centos:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK7LDD/Df/YYEDcZPQfzkvrUsbbG3Vbm1SrSKKSTTjDl nicolay@nicolay-VirtualBox"
+    "serial-port-enable" = 1
+  }
+}
