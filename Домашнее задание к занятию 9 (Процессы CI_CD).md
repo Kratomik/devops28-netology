@@ -336,8 +336,6 @@ nicolay@nicolay-VirtualBox:~$
 
 [maven-metadata](screen/maven-metadata.xml)
 
-<img src="screen/maven-metadata.xml" width="" height="500"/>
-
 <img src="screen/metadata.png" width="" height="500"/>
 
 ### Знакомство с Maven
