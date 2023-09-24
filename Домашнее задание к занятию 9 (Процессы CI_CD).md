@@ -355,6 +355,7 @@ nicolay@nicolay-VirtualBox:~$
 3. Проверьте директорию `~/.m2/repository/`, найдите ваш артефакт.
 4. В ответе пришлите исправленный файл `pom.xml`.
 - Ответ:
+
 [pom](screen/pom.xml)
 
 ---
