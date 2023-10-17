@@ -29,6 +29,8 @@
 <img src="screen/nexus-maven.png" width="" height="500"/>
 
 8. Мигрируйте `build configuration` в репозиторий.
+- Ответ:
+[build configuration](https://github.com/Kratomik/example-teamcity/blob/master/.teamcity/settings.kts)
 9. Создайте отдельную ветку `feature/add_reply` в репозитории.
 10. Напишите новый метод для класса Welcomer: метод должен возвращать произвольную реплику, содержащую слово `hunter`.
 11. Дополните тест для нового метода на поиск слова `hunter` в новой реплике.
