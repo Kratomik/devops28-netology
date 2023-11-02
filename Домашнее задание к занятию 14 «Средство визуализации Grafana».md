@@ -45,9 +45,22 @@
 - количество места на файловой системе.
 
 Для решения этого задания приведите promql-запросы для выдачи этих метрик, а также скриншот получившейся Dashboard.
-- Ответ:
+
+- Ответ: утилизация CPU для nodeexporter
 ```Bash
 100 - ((irate(node_cpu_seconds_total{job="node_exporter_clients",mode="idle"}[5m])) * 100)
+```
+- Ответ: CPULA 1/5/15
+```Bash
+
+```
+- Ответ: количество свободной оперативной памяти
+```Bash
+100 * (1 - ((avg_over_time(node_memory_MemFree_bytes[5m]) + avg_over_time(node_memory_Cached_bytes[5m]) + avg_over_time(node_memory_Buffers_bytes[5m])) / avg_over_time(node_memory_MemTotal_bytes[5m])))
+```
+- Ответ: количество места на файловой системе
+```Bash
+node_filesystem_avail_bytes {fstype=~"ext4|xfs"}
 ```
 
 ## Задание 3
