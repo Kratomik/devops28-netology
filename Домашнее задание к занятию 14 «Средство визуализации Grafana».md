@@ -62,7 +62,7 @@
 ```Bash
 node_filesystem_avail_bytes {fstype=~"ext4|xfs"}
 ```
-
+<img src="screen/Dashboard-1.png" width="" height="500"/>
 ## Задание 3
 
 1. Создайте для каждой Dashboard подходящее правило alert — можно обратиться к первой лекции в блоке «Мониторинг».
