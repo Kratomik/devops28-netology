@@ -48,7 +48,7 @@
 
 - Ответ: утилизация CPU для nodeexporter
 ```Bash
-100 - ((irate(node_cpu_seconds_total{job="node_exporter_clients",mode="idle"}[5m])) * 100)
+100 - ((irate(node_cpu_seconds_total{instance="nodeexporter:9100",mode="idle"}[5m])) * 100)
 ```
 - Ответ: CPULA 1/5/15
 ```Bash
