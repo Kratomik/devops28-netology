@@ -52,7 +52,7 @@
 ```
 - Ответ: CPULA 1/5/15
 ```Bash
-
+100 - (avg by (instance)(irate(node_cpu_seconds_total{instance="nodeexporter:9100",mode="idle"}[5m])) * 100)
 ```
 - Ответ: количество свободной оперативной памяти
 ```Bash
