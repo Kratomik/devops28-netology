@@ -45,7 +45,7 @@ Filebeat следует сконфигурировать для отправки
 - ваши yml-конфигурации для стека (если вы не использовали директорию help).
 
 - Ответ:
-<img src="screen/docker-ps.png" width="" height="500"/>
+<img src="screen/docker-ps.png" />
 
 ## Задание 2
 
