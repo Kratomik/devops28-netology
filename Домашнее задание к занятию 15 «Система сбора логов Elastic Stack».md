@@ -46,6 +46,7 @@ Filebeat следует сконфигурировать для отправки
 
   - Ответ:
   ```Bash
+  
   nicolay@nicolay-VirtualBox:~/mnt-homeworks/10-monitoring-04-elk/help$ docker ps -a
 CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS         PORTS                                                                                            NAMES
 8769d0301fa0   elastic/filebeat:8.7.0   "/usr/bin/tini -- /u…"   5 minutes ago   Up 5 minutes                                                                                                    filebeat
@@ -55,7 +56,9 @@ cc16a5359668   elasticsearch:8.7.0      "/bin/tini -- /usr/l…"   5 minutes ago
 17baa8ff8a3d   python:3.9-alpine        "python3 /opt/run.py"    5 minutes ago   Up 5 minutes                                                                                                    some_app
 37af446989c6   elasticsearch:8.7.0      "/bin/tini -- /usr/l…"   5 minutes ago   Up 5 minutes   9200/tcp, 9300/tcp                                                                               es-warm
 nicolay@nicolay-VirtualBox:~/mnt-homeworks/10-monitoring-04-elk/help$
+
 ```
+
 
 ## Задание 2
 
