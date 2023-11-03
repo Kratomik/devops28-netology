@@ -47,6 +47,8 @@ Filebeat следует сконфигурировать для отправки
 - Ответ:
 <img src="screen/docker-ps.png" />
 
+<img src="screen/kibana.png" />
+
 ## Задание 2
 
 Перейдите в меню [создания index-patterns  в kibana](http://localhost:5601/app/management/kibana/indexPatterns/create) и создайте несколько index-patterns из имеющихся.
