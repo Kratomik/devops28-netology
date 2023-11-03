@@ -45,9 +45,9 @@ Filebeat следует сконфигурировать для отправки
 - ваши yml-конфигурации для стека (если вы не использовали директорию help).
 
   - Ответ:
+
   ```Bash
-  
-  nicolay@nicolay-VirtualBox:~/mnt-homeworks/10-monitoring-04-elk/help$ docker ps -a
+nicolay@nicolay-VirtualBox:~/mnt-homeworks/10-monitoring-04-elk/help$ docker ps -a
 CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS         PORTS                                                                                            NAMES
 8769d0301fa0   elastic/filebeat:8.7.0   "/usr/bin/tini -- /u…"   5 minutes ago   Up 5 minutes                                                                                                    filebeat
 30a7f32d7c28   logstash:8.7.0           "/usr/local/bin/dock…"   5 minutes ago   Up 5 minutes   0.0.0.0:5044->5044/tcp, :::5044->5044/tcp, 0.0.0.0:5046->5046/tcp, :::5046->5046/tcp, 9600/tcp   logstash
