@@ -73,7 +73,7 @@
 3. Подключиться к дашборду с помощью port-forward.
 
 - Ответ:
-<img src="screen/kubectl.png" width="" height="500"/>
+<img src="screen/kubectl-1.png" width="" height="500"/>
 
 - Ответ:
 <img src="screen/kubernetes-dashboard.png" width="" height="500"/>
