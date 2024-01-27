@@ -64,7 +64,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
   selector:
     app: netology-web
 
@@ -80,13 +80,13 @@ metadata:
 spec:
   containers:
   - name: netology-web
-    image: nginx:1.14.2
+    image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2
 ```
 
 4. Подключиться локально к Service с помощью `kubectl port-forward` и вывести значение (curl или в браузере).
 
 - Ответ:
-<img src="screen/netology-svc.png" width="" height="500"/>
+<img src="screen/netology-svc-1.png" width="" height="500"/>
 ------
 
 ### Правила приёма работы
