@@ -35,7 +35,7 @@ spec:
   - name: hello-world
     image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2
     ports:
-    - containerPort: 80
+    - containerPort: 8080
 ```
 
 2. Использовать image - gcr.io/kubernetes-e2e-test-images/echoserver:2.2.
