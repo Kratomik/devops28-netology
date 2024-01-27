@@ -54,8 +54,39 @@ spec:
 1. Создать Pod с именем netology-web.
 2. Использовать image — gcr.io/kubernetes-e2e-test-images/echoserver:2.2.
 3. Создать Service с именем netology-svc и подключить к netology-web.
+
+- Ответ:
+```Bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: netology-svc
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+  selector:
+    app: netology-web
+
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netology-web
+  labels:
+    app: netology-web
+spec:
+  containers:
+  - name: netology-web
+    image: nginx:1.14.2
+```
+
 4. Подключиться локально к Service с помощью `kubectl port-forward` и вывести значение (curl или в браузере).
 
+- Ответ:
+<img src="screen/netology-svc.png" width="" height="500"/>
 ------
 
 ### Правила приёма работы
