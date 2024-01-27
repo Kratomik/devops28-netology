@@ -33,7 +33,7 @@ metadata:
 spec:
   containers:
   - name: hello-world
-    image: nginx:1.14.2
+    image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2
     ports:
     - containerPort: 80
 ```
@@ -45,7 +45,7 @@ spec:
 3. Подключиться локально к Pod с помощью `kubectl port-forward` и вывести значение (curl или в браузере).
 
 - Ответ:
-<img src="screen/hello-world.png" width="" height="500"/>
+<img src="screen/hello-world-2.png" width="" height="500"/>
 
 ------
 
