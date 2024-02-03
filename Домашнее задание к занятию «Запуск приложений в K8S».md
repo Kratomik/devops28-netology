@@ -67,6 +67,37 @@ spec:
 ### Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
 
 1. Создать Deployment приложения nginx и обеспечить старт контейнера только после того, как будет запущен сервис этого приложения.
+- Ответ:
+
+```Bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.19
+          ports:
+          - containerPort: 80
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: [ 'sh', '-c', "until nslookup myservice.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+```
+
+
 2. Убедиться, что nginx не стартует. В качестве Init-контейнера взять busybox.
 3. Создать и запустить Service. Убедиться, что Init запустился.
 4. Продемонстрировать состояние пода до и после запуска сервиса.
