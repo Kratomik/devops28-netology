@@ -34,6 +34,22 @@
 <img src="screen/kubectl-get-pods-2.png" width="" height="500"/>
 
 4. Создать Service, который обеспечит доступ до реплик приложений из п.1.
+
+- Овет:
+```Bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nginx
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+  selector:
+    app: nginx
+```
+
+
 5. Создать отдельный Pod с приложением multitool и убедиться с помощью `curl`, что из пода есть доступ до приложений из п.1.
 
 ------
