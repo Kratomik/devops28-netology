@@ -53,6 +53,12 @@ spec:
 
 5. Создать отдельный Pod с приложением multitool и убедиться с помощью `curl`, что из пода есть доступ до приложений из п.1.
 
+- Ответ:
+
+<img src="screen/curl-multitool-1.png" width="" height="500"/>
+
+<img src="screen/curl-multitool-2.png" width="" height="500"/>
+
 ------
 
 ### Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
