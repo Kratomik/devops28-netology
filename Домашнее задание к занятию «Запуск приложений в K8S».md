@@ -48,6 +48,7 @@ spec:
   selector:
     app: nginx
 ```
+<img src="screen/describe-svc.png" width="" height="500"/>
 
 
 5. Создать отдельный Pod с приложением multitool и убедиться с помощью `curl`, что из пода есть доступ до приложений из п.1.
