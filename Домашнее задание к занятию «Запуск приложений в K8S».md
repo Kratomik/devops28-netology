@@ -96,7 +96,7 @@ spec:
           image: busybox:1.28
           command: [ 'sh', '-c', "until nslookup myservice.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
 ```
-
+<img src="screen/init-containers.png" width="" height="500"/>
 
 2. Убедиться, что nginx не стартует. В качестве Init-контейнера взять busybox.
 3. Создать и запустить Service. Убедиться, что Init запустился.
