@@ -48,8 +48,12 @@ metadata:
   name: svc-nginx
 spec:
   ports:
-    - protocol: TCP
+    - name: nginx
+      protocol: TCP
       port: 80
+    - name: multitool
+      protocol: TCP
+      port: 1180
   selector:
     app: nginx
 ```
