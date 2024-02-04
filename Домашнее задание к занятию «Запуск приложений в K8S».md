@@ -26,7 +26,7 @@
 
 1. Создать Deployment приложения, состоящего из двух контейнеров — nginx и multitool. Решить возникшую ошибку.
 
--Ответ:
+- Ответ:
 
 <img src="screen/nginx.yml" width="" height="500"/>
 
