@@ -72,7 +72,7 @@ spec:
 
 <img src="screen/curl-svc.png" width="" height="500"/>
 
-<img src="screen/curl-svc-1180.png" width="" height="500"/>
+<img src="screen/curl-svc-1-1180.png" width="" height="500"/>
 
 
 ------
