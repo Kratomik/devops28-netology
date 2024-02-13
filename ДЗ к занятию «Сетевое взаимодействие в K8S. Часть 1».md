@@ -192,7 +192,48 @@ multitool:/#
 ### Задание 2. Создать Service и обеспечить доступ к приложениям снаружи кластера
 
 1. Создать отдельный Service приложения из Задания 1 с возможностью доступа снаружи кластера к nginx, используя тип NodePort.
+- Ответ:
+```Bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nodeport
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 32005
+  selector:
+    app: nginx
+```
+
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl describe svc/svc-nodeport
+Name:                     svc-nodeport
+Namespace:                default
+Labels:                   <none>
+Annotations:              <none>
+Selector:                 app=nginx
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.152.183.240
+IPs:                      10.152.183.240
+Port:                     <unset>  80/TCP
+TargetPort:               80/TCP
+NodePort:                 <unset>  32005/TCP
+Endpoints:                10.1.118.159:80,10.1.118.160:80,10.1.118.161:80
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
+
 2. Продемонстрировать доступ с помощью браузера или `curl` с локального компьютера.
+- Ответ:
+<img src="screen/svc-nodeport.png" width="" height="500"/>
+
 3. Предоставить манифест и Service в решении, а также скриншоты или вывод команды п.2.
 
 ------
