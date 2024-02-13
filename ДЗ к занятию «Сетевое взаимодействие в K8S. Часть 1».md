@@ -27,6 +27,63 @@
 1. Создать Deployment приложения, состоящего из двух контейнеров (nginx и multitool), с количеством реплик 3 шт.
 2. Создать Service, который обеспечит доступ внутри кластера до контейнеров приложения из п.1 по порту 9001 — nginx 80, по 9002 — multitool 8080.
 3. Создать отдельный Pod с приложением multitool и убедиться с помощью `curl`, что из пода есть доступ до приложения из п.1 по разным портам в разные контейнеры.
+
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl describe svc/svc-nginx
+Name:              svc-nginx
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=nginx
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.152.183.26
+IPs:               10.152.183.26
+Port:              nginx  9001/TCP
+TargetPort:        80/TCP
+Endpoints:         10.1.118.159:80,10.1.118.160:80,10.1.118.161:80
+Port:              multitool  9002/TCP
+TargetPort:        8080/TCP
+Endpoints:         10.1.118.159:8080,10.1.118.160:8080,10.1.118.161:8080
+Session Affinity:  None
+Events:            <none>
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl exec -it multitool /bin/bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+multitool:/#
+multitool:/#
+multitool:/# curl http://10.152.183.26:9001
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+multitool:/# curl http://10.152.183.26:9002
+WBITT Network MultiTool (with NGINX) - deployment-698d5c746f-jt5fz - 10.1.118.159 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
+multitool:/#
+```
+
 4. Продемонстрировать доступ с помощью `curl` по доменному имени сервиса.
 5. Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
 
