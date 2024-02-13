@@ -66,6 +66,16 @@ spec:
             cpu: 100m
             memory: 256Mi
 ```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pods
+NAME                          READY   STATUS    RESTARTS   AGE
+deployment-698d5c746f-jt5fz   2/2     Running   0          31m
+deployment-698d5c746f-nzvwj   2/2     Running   0          31m
+deployment-698d5c746f-msmfh   2/2     Running   0          31m
+multitool                     1/1     Running   0          30m
+nicolay@nicolay-VirtualBox:~/Загрузки$
+
+```
 
 2. Создать Service, который обеспечит доступ внутри кластера до контейнеров приложения из п.1 по порту 9001 — nginx 80, по 9002 — multitool 8080.
 
