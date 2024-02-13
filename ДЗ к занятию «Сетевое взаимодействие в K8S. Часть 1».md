@@ -148,6 +148,43 @@ multitool:/#
 ```
 
 4. Продемонстрировать доступ с помощью `curl` по доменному имени сервиса.
+
+- Ответ:
+```Bash
+multitool:/#
+multitool:/# clear
+multitool:/#
+multitool:/# curl http://svc-nginx:9001
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+multitool:/# curl http://svc-nginx:9002
+WBITT Network MultiTool (with NGINX) - deployment-698d5c746f-msmfh - 10.1.118.160 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
+multitool:/#
+```
+
 5. Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
 
 ------
