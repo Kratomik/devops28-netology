@@ -113,7 +113,7 @@ spec:
   ports:
     - name: nginx
       protocol: TCP
-      port: 9001
+      port: 80
       targetPort: 80
   selector:
     app: nginx
@@ -127,7 +127,7 @@ spec:
   ports:
     - name: multitool
       protocol: TCP
-      port: 9002
+      port: 80
       targetPort: 8080
   selector:
     app: back
@@ -137,7 +137,7 @@ spec:
 4. Продемонстрировать, что приложения видят друг друга с помощью Service.
 - Ответ:
 ```Bash
-multitool:/# curl http://svc-front:9001
+multitool:/# curl http://svc-front:80
 <!DOCTYPE html>
 <html>
 <head>
@@ -163,12 +163,12 @@ Commercial support is available at
 <p><em>Thank you for using nginx.</em></p>
 </body>
 </html>
-multitool:/# curl http://svc-back:9002
+multitool:/# curl http://svc-back:80
 WBITT Network MultiTool (with NGINX) - backend-b8d656c6b-qd8qx - 10.1.118.137 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
 multitool:/#
 ```
 ```Bash
-backend-b8d656c6b-qd8qx:/# curl http://svc-front:9001
+backend-b8d656c6b-qd8qx:/# curl http://svc-front:80
 <!DOCTYPE html>
 <html>
 <head>
