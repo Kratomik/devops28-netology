@@ -26,7 +26,81 @@
 ### Задание 1. Создать Deployment приложений backend и frontend
 
 1. Создать Deployment приложения _frontend_ из образа nginx с количеством реплик 3 шт.
+
+- Ответ:
+```Bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fronted
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: fronted
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
 2. Создать Deployment приложения _backend_ из образа multitool. 
+
+- Ответ:
+```Bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back
+  template:
+    metadata:
+      labels:
+        app: back
+    spec:
+      containers:
+      - name: backend
+        image: wbitt/network-multitool
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: HTTP_PORT
+            value: "8080"
+        ports:
+        - containerPort: 8080
+        name: http-port
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pods
+NAME                      READY   STATUS    RESTARTS   AGE
+fronted-f84d474c8-j9642   1/1     Running   0          4m56s
+fronted-f84d474c8-vrmrx   1/1     Running   0          4m56s
+fronted-f84d474c8-skw84   1/1     Running   0          4m56s
+backend-b8d656c6b-qd8qx   1/1     Running   0          68s
+
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
+
 3. Добавить Service, которые обеспечат доступ к обоим приложениям внутри кластера. 
 4. Продемонстрировать, что приложения видят друг друга с помощью Service.
 5. Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
