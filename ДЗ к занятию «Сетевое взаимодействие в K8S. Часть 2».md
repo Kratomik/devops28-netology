@@ -102,7 +102,100 @@ nicolay@nicolay-VirtualBox:~/Загрузки$
 ```
 
 3. Добавить Service, которые обеспечат доступ к обоим приложениям внутри кластера. 
+
+- Ответ:
+```Bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-front
+spec:
+  ports:
+    - name: nginx
+      protocol: TCP
+      port: 9001
+      targetPort: 80
+  selector:
+    app: nginx
+```
+```Bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-back
+spec:
+  ports:
+    - name: multitool
+      protocol: TCP
+      port: 9002
+      targetPort: 8080
+  selector:
+    app: back
+```
+
+
 4. Продемонстрировать, что приложения видят друг друга с помощью Service.
+- Ответ:
+```Bash
+multitool:/# curl http://svc-front:9001
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+multitool:/# curl http://svc-back:9002
+WBITT Network MultiTool (with NGINX) - backend-b8d656c6b-qd8qx - 10.1.118.137 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
+multitool:/#
+```
+```Bash
+backend-b8d656c6b-qd8qx:/# curl http://svc-front:9001
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
 5. Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
 
 ------
