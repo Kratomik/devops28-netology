@@ -204,7 +204,74 @@ Commercial support is available at
 
 1. Включить Ingress-controller в MicroK8S.
 2. Создать Ingress, обеспечивающий доступ снаружи по IP-адресу кластера MicroK8S так, чтобы при запросе только по адресу открывался _frontend_ а при добавлении /api - _backend_.
+
+- Ответ:
+```Bash
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: http-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: "nginx"
+  rules:
+  - host: microk8s.example.ru
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-front
+            port:
+              number: 80
+      - path: /app
+        pathType: Exact
+        backend:
+          service:
+            name: svc-back
+            port:
+              number: 8080
+```
+
 3. Продемонстрировать доступ с помощью браузера или `curl` с локального компьютера.
+
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ curl -H "Host: microk8s.example.ru" http://10.1.118.128
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ curl -H "Host: microk8s.example.ru" http://10.1.118.128/app
+WBITT Network MultiTool (with NGINX) - backend-b8d656c6b-qd8qx - 10.1.118.137 - HTTP: 8080 , HTTPS: 443 . (Formerly praqma/network-multitool)
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
 4. Предоставить манифесты и скриншоты или вывод команды п.2.
 
 ------
