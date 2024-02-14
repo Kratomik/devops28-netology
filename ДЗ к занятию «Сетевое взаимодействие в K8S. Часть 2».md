@@ -234,6 +234,17 @@ spec:
             port:
               number: 8080
 ```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get svc -A
+NAMESPACE        NAME              TYPE           CLUSTER-IP       EXTERNAL-IP    PORT(S)                      AGE
+default          kubernetes        ClusterIP      10.152.183.1     <none>         443/TCP                      11d
+kube-system      kube-dns          ClusterIP      10.152.183.10    <none>         53/UDP,53/TCP,9153/TCP       11d
+metallb-system   webhook-service   ClusterIP      10.152.183.69    <none>         443/TCP                      26m
+ingress          ingress           LoadBalancer   10.152.183.105   10.1.118.128   80:30700/TCP,443:31616/TCP   31m
+default          svc-front         ClusterIP      10.152.183.228   <none>         80/TCP                       72m
+default          svc-back          ClusterIP      10.152.183.132   <none>         80/TCP                       71m
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
 
 3. Продемонстрировать доступ с помощью браузера или `curl` с локального компьютера.
 
