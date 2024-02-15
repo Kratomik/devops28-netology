@@ -29,9 +29,87 @@
 Создать Deployment приложения, состоящего из двух контейнеров и обменивающихся данными.
 
 1. Создать Deployment приложения, состоящего из контейнеров busybox и multitool.
+- Ответ:
+```Bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busy
+  template:
+    metadata:
+      labels:
+        app: busy
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        volumeMounts:
+        - name: netology
+          mountPath: /tmp
+
+      - name: busybox
+        image: busybox:1.28
+        command: [ 'sh', '-c', 'watch -n 5 echo Netology privet > /tmp/netology.txt' ]
+        volumeMounts:
+        - name: netology
+          mountPath: /tmp
+      volumes:
+        - name: netology
+          emptyDir: {}
+```
+
 2. Сделать так, чтобы busybox писал каждые пять секунд в некий файл в общей директории.
 3. Обеспечить возможность чтения файла контейнером multitool.
 4. Продемонстрировать, что multitool может читать файл, который периодоически обновляется.
+
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl exec -it deployment-766774fbbf-kkxm9 bin/bash
+deployment-766774fbbf-kkxm9:/# cat /tmp/netology.txt
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:10
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:15
+
+Netology privet
+deployment-766774fbbf-kkxm9:/#
+```
+```Bash
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:15
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:20
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:25
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:30
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:35
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-15 12:19:40
+```
+
 5. Предоставить манифесты Deployment в решении, а также скриншоты или вывод команды из п. 4.
 
 ------
