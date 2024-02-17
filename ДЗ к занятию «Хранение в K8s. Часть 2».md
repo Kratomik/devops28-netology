@@ -31,9 +31,152 @@
 
 1. Создать Deployment приложения, состоящего из контейнеров busybox и multitool.
 2. Создать PV и PVC для подключения папки на локальной ноде, которая будет использована в поде.
+- Ответ:
+```Bash
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: my-pv
+spec:
+   capacity:
+     storage: 1Mi
+   accessModes:
+   - ReadWriteOnce
+   persistentVolumeReclaimPolicy: Delete
+   storageClassName: ""
+   hostPath:
+      path: /data/pv
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mult
+  template:
+    metadata:
+      labels:
+        app: mult
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: HTTP_PORT
+            value: "8080"
+        ports:
+        - containerPort: 8080
+        name: http-port
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        volumeMounts:
+        - name: netology
+          mountPath: /tmp
+      - name: busybox
+        image: busybox:1.28
+        command: [ 'sh', '-c', 'watch -n 5 echo Netology privet > /tmp/netology.txt' ]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: netology
+          mountPath: /tmp
+      volumes:
+        - name: netology
+          persistentVolumeClaim:
+            claimName: my-pvc
+```
 3. Продемонстрировать, что multitool может читать файл, в который busybox пишет каждые пять секунд в общей директории. 
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl exec -it deployment-5fd8c98b74-4r2dw  bin/bash
+deployment-5fd8c98b74-4r2dw:/# cat /tmp/netology.txt
+Every 5s: echo Netology privet                              2024-02-17 07:01:26
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:31
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:36
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:41
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:46
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:51
+
+Netology privet
+deployment-5fd8c98b74-4r2dw:/#
+```
+```Bash
+deployment-5fd8c98b74-4r2dw:/# cat /tmp/netology.txt
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:51
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:01:56
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:02:01
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:02:06
+
+Netology privet
+Every 5s: echo Netology privet                              2024-02-17 07:02:11
+```
 4. Удалить Deployment и PVC. Продемонстрировать, что после этого произошло с PV. Пояснить, почему.
+- Ответ: после удаления Deployments и PVC, PV свалился в статус "Failed", это произошло потому что удалена связь между PV --> PVC, если PVC не удалять, связь останется и PV будет в статусе "Bound". 
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl delete -f ./busytool.yml
+persistentvolumeclaim "my-pvc" deleted
+deployment.apps "deployment" deleted
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pv
+NAME    CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM            STORAGECLASS   REASON   AGE
+my-pv   1Mi        RWO            Delete           Failed   default/my-pvc                           7m16s
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
 5. Продемонстрировать, что файл сохранился на локальном диске ноды. Удалить PV.  Продемонстрировать что произошло с файлом после удаления PV. Пояснить, почему.
+- Ответ: файл сохранился локально на машине по пути /data/pv
+```Bash
+nicolay@nicolay-VirtualBox:/$ ls -lah /data/pv/
+итого 12K
+drwxr-xr-x 2 root root 4,0K фев 17 13:55 .
+drwxr-xr-x 3 root root 4,0K фев 17 13:55 ..
+-rw-r--r-- 1 root root 1,5K фев 17 14:19 netology.txt
+nicolay@nicolay-VirtualBox:/$
+```
 5. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
 
 ------
