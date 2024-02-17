@@ -205,7 +205,87 @@ nicolay@nicolay-VirtualBox:~/Загрузки$
 
 1. Включить и настроить NFS-сервер на MicroK8S.
 2. Создать Deployment приложения состоящего из multitool, и подключить к нему PV, созданный автоматически на сервере NFS.
+- Ответ:
+```Bash
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-multitool
+spec:
+  storageClassName: "nfs"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multitool
+  labels:
+    app: mult
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mult
+  template:
+    metadata:
+      labels:
+        app: mult
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: netology
+          mountPath: /usr/share/nginx/html/index.html
+      volumes:
+        - name: netology
+          persistentVolumeClaim:
+            claimName: pvc-multitool
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl apply -f ./multitool-nfs.yml
+persistentvolumeclaim/pvc-multitool created
+deployment.apps/multitool created
+nicolay@nicolay-VirtualBox:~/Загрузки$
+nicolay@nicolay-VirtualBox:~/Загрузки$
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                                  STORAGECLASS   REASON   AGE
+data-nfs-server-provisioner-0              1Gi        RWO            Retain           Bound    nfs-server-provisioner/data-nfs-server-provisioner-0                           28m
+pvc-624af378-61ca-47a0-842e-0934cbd08670   10Mi       RWO            Delete           Bound    default/pvc-multitool                                  nfs                     25s
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pvc
+NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-multitool   Bound    pvc-624af378-61ca-47a0-842e-0934cbd08670   10Mi       RWO            nfs            29s
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pods
+NAME                        READY   STATUS    RESTARTS   AGE
+multitool-77678b77d-c4tcl   1/1     Running   0          47s
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
 3. Продемонстрировать возможность чтения и записи файла изнутри пода. 
+- Ответ:
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pods -o wide
+NAME                         READY   STATUS    RESTARTS   AGE    IP             NODE                 NOMINATED NODE   READINESS GATES
+multitool-78d9d685fd-9mxwx   1/1     Running   0          3m9s   10.1.118.176   nicolay-virtualbox   <none>           <none>
+nicolay@nicolay-VirtualBox:~/Загрузки$
+nicolay@nicolay-VirtualBox:~/Загрузки$
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl exec -it multitool-78d9d685fd-9mxwx bin/bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+multitool-78d9d685fd-9mxwx:/# touch /usr/share/nginx/html/index.html
+multitool-78d9d685fd-9mxwx:/# echo Privet! > /usr/share/nginx/html/index.html
+multitool-78d9d685fd-9mxwx:/# curl 10.1.118.176
+Privet!
+multitool-78d9d685fd-9mxwx:/# cat /usr/share/nginx/html/index.html
+Privet!
+multitool-78d9d685fd-9mxwx:/#
+```
 4. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
 
 ------
