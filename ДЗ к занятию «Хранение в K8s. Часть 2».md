@@ -260,9 +260,11 @@ nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pv
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                                  STORAGECLASS   REASON   AGE
 data-nfs-server-provisioner-0              1Gi        RWO            Retain           Bound    nfs-server-provisioner/data-nfs-server-provisioner-0                           28m
 pvc-624af378-61ca-47a0-842e-0934cbd08670   10Mi       RWO            Delete           Bound    default/pvc-multitool                                  nfs                     25s
+
 nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pvc
 NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 pvc-multitool   Bound    pvc-624af378-61ca-47a0-842e-0934cbd08670   10Mi       RWO            nfs            29s
+
 nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl get pods
 NAME                        READY   STATUS    RESTARTS   AGE
 multitool-77678b77d-c4tcl   1/1     Running   0          47s
