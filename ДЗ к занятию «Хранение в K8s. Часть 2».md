@@ -177,6 +177,22 @@ drwxr-xr-x 3 root root 4,0K фев 17 13:55 ..
 -rw-r--r-- 1 root root 1,5K фев 17 14:19 netology.txt
 nicolay@nicolay-VirtualBox:/$
 ```
+После удаления PV файл остался не тронутым. В конфиге политика стоит "Delete", поэтому он должен был удалиться, но драйвером не поддерживается данная команда.
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ kubectl delete -f ./busytool.yml
+persistentvolume "my-pv" deleted
+Error from server (NotFound): error when deleting "./busytool.yml": persistentvolumeclaims "my-pvc" not found
+Error from server (NotFound): error when deleting "./busytool.yml": deployments.apps "deployment" not found
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
+```Bash
+nicolay@nicolay-VirtualBox:~/Загрузки$ sudo ls -lah /data/pv/
+итого 12K
+drwxr-xr-x 2 root root 4,0K фев 17 13:55 .
+drwxr-xr-x 3 root root 4,0K фев 17 13:55 ..
+-rw-r--r-- 1 root root 1,3K фев 17 14:28 netology.txt
+nicolay@nicolay-VirtualBox:~/Загрузки$
+```
 5. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
 
 ------
